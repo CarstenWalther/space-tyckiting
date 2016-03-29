@@ -192,7 +192,7 @@ A bot's action can be one of the following: `move`, `radar` or `cannon`.
     ```json
     {
         "type": "end",
-        "winnerTeamId": <winner team id or null if a tie>,
+        "winnerTeamId": <winner team id or -1 if a tie>,
         "you": <your team information>
     }
     ```

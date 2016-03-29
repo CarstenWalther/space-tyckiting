@@ -10,7 +10,7 @@ function winningEvent(winningTeamId) {
 function tieEvent() {
     return {
         event: "end",
-        winnerTeamId: null
+        winnerTeamId: -1
     };
 }
 

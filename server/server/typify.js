@@ -75,7 +75,7 @@ typify.record("joinMessage", {
 
 typify.record("endMessage", {
     type: "'end'",
-    winnerTeamId: "teamId | null",
+    winnerTeamId: "teamId | integer",
     you: "team"
 }, true);
 
