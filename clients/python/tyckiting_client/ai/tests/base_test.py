@@ -66,3 +66,17 @@ class BaseAiTest(unittest.TestCase):
             Pos(x= 2, y= 0),
         ))
         self.assertEqual(positions, expected_positions)
+
+    def test_coordinatesToPositions(self):
+        coordinates = set([(0,0), (0,-1), (1,-1), (1,0), (0,1), (0,1), (-1,1), (-1,0)])
+        positions = set(self.ai.coordinatesToPositions(coordinates))
+        expected_positions = set((
+            Pos(x=0, y=0),
+            Pos(x=0, y=-1),
+            Pos(x=1, y=-1),
+            Pos(x=1, y=0),
+            Pos(x=0, y=1),
+            Pos(x=-1, y=1),
+            Pos(x=-1, y=0),
+        ))
+        self.assertEqual(positions, expected_positions)

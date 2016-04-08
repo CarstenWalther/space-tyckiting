@@ -1,5 +1,5 @@
 from tyckiting_client import messages
-import tyckiting_client.hexagon
+from tyckiting_client import hexagon
 
 
 class BaseAi:
@@ -32,7 +32,10 @@ class BaseAi:
         raise NotImplementedError()
 
     def get_valid_moves(self, bot):
-        return self.get_positions_in_range(x=bot.pos.x, y=bot.pos.y, radius=self.config.move)
+        coordinates = set()
+        for radius in range(1, self.config.move + 1):
+            coordinates |= hexagon.get_ring((bot.pos.x, bot.pos.y), radius)
+        return self.coordinatesToPositions(coordinates)
 
     def get_valid_cannons(self, bot):
         return self.get_positions_in_range(x=0, y=0, radius=self.config.field_radius)
@@ -44,4 +47,8 @@ class BaseAi:
         for dx in range(-radius, radius+1):
             for dy in range(max(-radius, -dx-radius), min(radius, -dx+radius)+1):
                 yield messages.Pos(dx+x, dy+y)
+
+    def coordinatesToPositions(self, coords):
+        for coord in coords:
+            yield messages.Pos(coord[0], coord[1])
 
