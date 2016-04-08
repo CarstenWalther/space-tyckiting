@@ -35,6 +35,7 @@ class BaseAi:
         coordinates = set()
         for radius in range(1, self.config.move + 1):
             coordinates |= hexagon.get_ring((bot.pos.x, bot.pos.y), radius)
+        coordinates = hexagon.extractValidCoordinates(coordinates, self.config.field_radius)
         return self.coordinatesToPositions(coordinates)
 
     def get_valid_cannons(self, bot):
@@ -51,4 +52,6 @@ class BaseAi:
     def coordinatesToPositions(self, coords):
         for coord in coords:
             yield messages.Pos(coord[0], coord[1])
+
+
 

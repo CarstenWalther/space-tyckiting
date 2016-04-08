@@ -67,6 +67,21 @@ class BaseAiTest(unittest.TestCase):
         ))
         self.assertEqual(positions, expected_positions)
 
+    def test_get_valid_moves_field_edge(self):
+        bot = Bot(1, 'bot1', '1', pos={'x':14, 'y':0})
+        positions = set(self.ai.get_valid_moves(bot))
+        expected_positions = set((
+            Pos(x=12, y= 0),
+            Pos(x=12, y= 1),
+            Pos(x=12, y= 2),
+            Pos(x=13, y=-1),
+            Pos(x=13, y= 0),
+            Pos(x=13, y= 1),
+            Pos(x=14, y=-2),
+            Pos(x=14, y=-1),
+        ))
+        self.assertEqual(positions, expected_positions)
+
     def test_coordinatesToPositions(self):
         coordinates = set([(0,0), (0,-1), (1,-1), (1,0), (0,1), (0,1), (-1,1), (-1,0)])
         positions = set(self.ai.coordinatesToPositions(coordinates))

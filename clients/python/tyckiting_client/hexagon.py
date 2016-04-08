@@ -24,3 +24,17 @@ def get_ring(coords=(0,0), radius=1):
 			results.add(cube)
 			cube = neighbor(cube, i)
 	return results
+
+def isInField(coords, radius):
+	x,y = coords
+	z = -x-y
+	return -radius <= x <= radius and \
+			-radius <= y <= radius and \
+			-radius <= z <= radius
+
+def extractValidCoordinates(coordinates, radius):
+	validCoordinates = set()
+	for coord in coordinates:
+		if isInField(coord, radius):
+			validCoordinates.add(coord)
+	return validCoordinates
