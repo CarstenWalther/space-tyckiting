@@ -40,6 +40,6 @@ class BaseAi:
         return self.get_positions_in_range(x=0, y=0, radius=self.config.field_radius)
 
     def get_positions_in_range(self, x=0, y=0, radius=1):
-        for dx in xrange(-radius, radius+1):
-            for dy in xrange(max(-radius, -dx-radius), min(radius, -dx+radius)+1):
+        for dx in range(-radius, radius+1):
+            for dy in range(max(-radius, -dx-radius), min(radius, -dx+radius)+1):
                 yield messages.Pos(dx+x, dy+y)

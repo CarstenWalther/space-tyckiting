@@ -27,7 +27,7 @@ def main():
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
     else:
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.ERROR)
 
     client = TykitingClient(args.host, args.port, args.name, args.ai)
     client.run()
