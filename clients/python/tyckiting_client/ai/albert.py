@@ -1,11 +1,12 @@
 import random
+import logging
 
 from tyckiting_client.ai import base
 from tyckiting_client import actions
 
 '''
 Rules:
-Bot shoots at first target if available
+Shoot at first target if available
 Else scan random field
 '''
 
@@ -22,7 +23,7 @@ class Ai(base.BaseAi):
             elif event.event == 'see':
                 targets.append(event.pos)
             else:
-                print('Unknown event', event.event)
+                logging.info('Unknown event %s', event.event)
 
         for bot in bots:
             if not bot.alive:
