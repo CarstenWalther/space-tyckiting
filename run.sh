@@ -1,8 +1,9 @@
 DUMMY="--ai=dummy --name=dummy"
-RAND="--ai=rand --name=random" 
+RAND="--ai=rand --name=random"
+LUDWIG="--ai=ludwig --name=ludwig" 
 
-AI1_ARGS=$DUMMY 
-AI2_ARGS="$RAND --verbose"
+AI1_ARGS="$DUMMY" 
+AI2_ARGS="$LUDWIG --verbose"
 
 
 cd server

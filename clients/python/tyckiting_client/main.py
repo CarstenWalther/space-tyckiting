@@ -20,12 +20,16 @@ def main():
                         help="Port to connect to")
     parser.add_argument('-v', '--verbose', action='store_true',
                         help="Verbose output")
+    parser.add_argument('-vv', '--verbose2', action='store_true',
+                        help="More Verbose output")
     parser.add_argument('-n', '--name', default='bot', help="Bot's name")
     parser.add_argument('-a', '--ai', default='dummy', help="Ai package")
     args = parser.parse_args()
 
-    if args.verbose:
+    if args.verbose2:
         logging.basicConfig(level=logging.DEBUG)
+    elif args.verbose:
+        logging.basicConfig(level=logging.INFO)
     else:
         logging.basicConfig(level=logging.ERROR)
 
