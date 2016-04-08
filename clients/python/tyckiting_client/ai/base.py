@@ -1,4 +1,5 @@
 from tyckiting_client import messages
+import tyckiting_client.hexagon
 
 
 class BaseAi:
@@ -43,3 +44,4 @@ class BaseAi:
         for dx in range(-radius, radius+1):
             for dy in range(max(-radius, -dx-radius), min(radius, -dx+radius)+1):
                 yield messages.Pos(dx+x, dy+y)
+

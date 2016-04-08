@@ -32,19 +32,18 @@ class Ai(base.BaseAi):
                 pass
             elif event.event == 'die':
                 pass
+            elif event.event == 'move':
+                pass
+            elif event.event == 'nocation':
+                pass
             else:
                 logging.info('Unknown event %s', event.event)
-
-        print(endangered)
 
         for bot in bots:
             if not bot.alive:
                 continue
             if bot.bot_id in endangered:
                 mov_pos = random.choice(list(self.get_valid_moves(bot)))
-                print(bot.pos)
-                for pos in self.get_valid_moves(bot):
-                    print('\t', pos)
                 action = actions.Move(bot_id=bot.bot_id, x=mov_pos.x, y=mov_pos.y)
             elif len(targets) > 0:
                 target = targets[0]
