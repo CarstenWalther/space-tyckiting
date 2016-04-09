@@ -1,3 +1,5 @@
+import logging
+
 from tyckiting_client import messages
 from tyckiting_client import hexagon
 
@@ -30,6 +32,37 @@ class BaseAi:
         """
 
         raise NotImplementedError()
+
+    def analyzeEvents(self, events):
+        targets = []
+        endangered = set()
+        for event in events:
+            if event.event == 'radarEcho':
+                targets.append(event.pos)
+            elif event.event == 'see':
+                targets.append(event.pos)
+            elif event.event == 'detected':
+                endangered.add(event.bot_id)
+            elif event.event == 'damaged':
+                pass
+            elif event.event == 'hit':
+                pass
+            elif event.event == 'die':
+                pass
+            elif event.event == 'move':
+                pass
+            elif event.event == 'noaction':
+                logging.info('Ship been idle')
+            else:
+                logging.info('Unknown event %s', event.event)
+        return targets, endangered
+
+    def livingBotCount(self, bots):
+        living = 0
+        for bot in bots:
+            if bot.alive:
+                living += 1
+        return living
 
     def get_valid_moves(self, bot):
         coordinates = set()
