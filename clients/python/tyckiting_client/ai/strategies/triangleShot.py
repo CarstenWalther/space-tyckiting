@@ -5,6 +5,12 @@ from tyckiting_client.hexagon import cube_add
 from tyckiting_client import actions
 from tyckiting_client import messages
 
+'''
+good against random movers and short distance movers
+bad vs straight distance 2 movers
+needs 3 bots to fire
+'''
+
 class TriangleShot(object):
 
 	def __init__(self):
@@ -12,7 +18,7 @@ class TriangleShot(object):
 		self.offsetsBySource = {}
 		self.center = None
 
-	def triangleShot(self, bots, targetPos):
+	def shoot(self, bots, targetPos):
 		logging.info('Attempt triangle shot at %s', targetPos)
 		self.offsetsBySource.clear()
 		shotCount = 0

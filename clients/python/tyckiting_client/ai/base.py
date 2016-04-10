@@ -33,29 +33,28 @@ class BaseAi:
 
         raise NotImplementedError()
 
-    def analyzeEvents(self, events):
-        targets = []
+    def getEndangeredBots(self, events):
         endangered = set()
+        for event in events:
+            if event.event == 'see':
+                endangered.add(event.source)
+            elif event.event == 'detected':
+                endangered.add(event.bot_id)
+            elif event.event == 'damaged':
+                pass
+                endangered.add(event.bot_id)
+        if endangered:
+            logging.info('endangered bots: %s', endangered)
+        return endangered
+
+    def getTargets(self, events):
+        targets = []
         for event in events:
             if event.event == 'radarEcho':
                 targets.append(event.pos)
             elif event.event == 'see':
                 targets.append(event.pos)
-            elif event.event == 'detected':
-                endangered.add(event.bot_id)
-            elif event.event == 'damaged':
-                pass
-            elif event.event == 'hit':
-                pass
-            elif event.event == 'die':
-                pass
-            elif event.event == 'move':
-                pass
-            elif event.event == 'noaction':
-                logging.info('Ship been idle')
-            else:
-                logging.info('Unknown event %s', event.event)
-        return targets, endangered
+        return targets
 
     def livingBotCount(self, bots):
         living = 0

@@ -16,7 +16,8 @@ class Ai(base.BaseAi):
     def move(self, bots, events):
         response = []
 
-        targetsPos, endangered = self.analyzeEvents(events)
+        targetsPos = self.getTargets(events)
+        endangered = self.getEndangeredBots(events)
 
         for bot in bots:
             if not bot.alive:

@@ -87,7 +87,7 @@ class TykitingClient():
 
     def on_events(self, message):
         logging.info('Round %s', message.round_id)
-        responses = self.ai.move(message.you.bots, message.events)
+        responses = self.ai.move(list(message.you.bots), list(message.events))
         actions = {
             'type': 'actions',
             'roundId': message.round_id,

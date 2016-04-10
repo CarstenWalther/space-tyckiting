@@ -2,6 +2,7 @@ import random
 
 from tyckiting_client.ai import base
 from tyckiting_client import actions
+from tyckiting_client.ai.strategies.triangleShot import TriangleShot
 
 '''
 Rules:
@@ -10,7 +11,6 @@ Else Move if in danger
 Else shoot at first target if available
 Else scan random field
 '''
-from tyckiting_client.ai.strategies.triangleShot import TriangleShot
 
 class Ai(base.BaseAi):
 
@@ -20,13 +20,13 @@ class Ai(base.BaseAi):
 
     def move(self, bots, events):
         response = []
-        bots = list(bots)
-        events = list(events)
         targetsPos = self.triShot.findTargets(events)
-        additionalTargets, endangered = self.analyzeEvents(events)
-        targetsPos += additionalTargets
+        if not targetsPos:
+            targetsPos = self.getTargets(events)
         if self.livingBotCount(bots) == 3 and len(targetsPos) > 0:
-            return self.triShot.triangleShot(bots, targetsPos[0])
+            return self.triShot.shoot(bots, targetsPos[0])
+
+        endangered = self.getEndangeredBots(events)
 
         for bot in bots:
             if not bot.alive:
