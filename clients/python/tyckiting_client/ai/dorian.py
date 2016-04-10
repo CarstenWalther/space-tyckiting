@@ -15,7 +15,7 @@ class Ai(base.BaseAi):
 
     def __init__(self, team_id, config=None):
         super(Ai, self).__init__(team_id, config)
-        self.escaping = escaping.RandomEscaping(self.config)
+        self.escaping = escaping.StraightDistance2Escaping(self.config)
 
     def move(self, bots, events):
         response = []

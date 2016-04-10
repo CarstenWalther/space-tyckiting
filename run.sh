@@ -1,11 +1,13 @@
 DUMMY="--ai=dummy --name=dummy"
 RAND="--ai=rand --name=random"
+
 ALBERT="--ai=albert --name=albert"
 BERTA="--ai=berta --name=berta"
 CECILLE="--ai=cecille --name=cecille"
+DORIAN="--ai=dorian --name=dorian"
 
 AI1_ARGS="$BERTA" 
-AI2_ARGS="$CECILLE --verbose"
+AI2_ARGS="$DORIAN --verbose"
 
 
 cd server
