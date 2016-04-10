@@ -8,7 +8,7 @@ from tyckiting_client.ai.strategies import scanning
 
 '''
 Rules:
-like eduard but only trishots if noone is endangered
+like frida with DontOvershootScanning
 '''
 
 class Ai(base.BaseAi):

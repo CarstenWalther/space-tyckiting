@@ -17,6 +17,13 @@ class BaseAi:
         """
         self.team_id = team_id
         self.config = config or {}
+        self.stats = None
+
+    def decide(self, bots, events):
+        logging
+        response = self.move(bots, events)
+        logging
+        return response
 
     def move(self, bots, events):
         """
@@ -42,8 +49,8 @@ class BaseAi:
             elif event.event == 'detected':
                 endangered.add(event.bot_id)
             elif event.event == 'damaged':
-                pass
                 #endangered.add(event.bot_id)
+                pass
         if endangered:
             logging.info('endangered bots: %s', endangered)
         return endangered
@@ -64,6 +71,22 @@ class BaseAi:
                 living += 1
         return living
 
+    def logEvents(self, events):
+        for event in events:
+            self.stats.analyzeEvent(event)
+
+    def logActions(self, actions):
+        for action in actions:
+            self.stats.analyzeAction(action)
+
+    def startLogging(self, teamBots):
+        teamBotIds = [bot.bot_id for bot in teamBots]
+        self.stats = stats.GameStats(teamBotIds)
+
+    def finishLogging(self, result, teamName):
+        logging.info(self.stats)
+        self.stats.writeToFile(result, teamName)
+
     def get_valid_cannons(self, bot):
         return self.get_positions_in_range(x=0, y=0, radius=self.config.field_radius)
 
@@ -78,6 +101,3 @@ class BaseAi:
     def coordinatesToPositions(self, coords):
         for coord in coords:
             yield messages.Pos(coord[0], coord[1])
-
-
-

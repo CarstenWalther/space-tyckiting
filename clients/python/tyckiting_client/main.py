@@ -83,11 +83,12 @@ class TykitingClient():
         Args:
             message: Message from server containing team compositions
         """
+        self.ai.startLogging(message.you.bots)
         logging.info('Game started')
 
     def on_events(self, message):
         logging.info('Round %s', message.round_id)
-        responses = self.ai.move(list(message.you.bots), list(message.events))
+        responses = self.ai.decide(list(message.you.bots), list(message.events))
         actions = {
             'type': 'actions',
             'roundId': message.round_id,
@@ -103,13 +104,17 @@ class TykitingClient():
             message: Message from server containing the winning team id
         """
         if message.winner_team_id is None:
-            result = "It's a draw."
+            resultMessage = "It's a draw."
+            result = 'draw'
         elif message.winner_team_id == self.team_id:
-            result = "You win!"
+            resultMessage = "You win!"
+            result = 'win'
         else:
-            result = "You loose."
+            resultMessage = "You lose."
+            result = 'defeat'
 
-        logging.info('Game ended. %s', result)
+        logging.info('Game ended. %s', resultMessage)
+        self.ai.finishLogging(result, self.name)
         self.ws.close()
 
     def on_error(self, message):
