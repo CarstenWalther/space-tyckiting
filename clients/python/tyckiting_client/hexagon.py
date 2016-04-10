@@ -38,3 +38,8 @@ def extractValidCoordinates(coordinates, radius):
 		if isInField(coord, radius):
 			validCoordinates.add(coord)
 	return validCoordinates
+
+def getCircle(radius=1, x=0, y=0):
+	for dx in range(-radius, radius+1):
+		for dy in range(max(-radius, -dx-radius), min(radius, -dx+radius)+1):
+			yield (dx+x, dy+y)

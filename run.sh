@@ -7,9 +7,10 @@ CECILLE="--ai=cecille --name=cecille"
 DORIAN="--ai=dorian --name=dorian"
 EDUARD="--ai=eduard --name=eduard"
 FRIDA="--ai=frida --name=frida"
+GERTRUDE="--ai=gertrude --name=gertrude"
 
-AI1_ARGS="$EDUARD" 
-AI2_ARGS="$FRIDA --verbose"
+AI1_ARGS="$FRIDA" 
+AI2_ARGS="$GERTRUDE --verbose"
 
 
 cd server

@@ -2,6 +2,7 @@ import logging
 
 from tyckiting_client import messages
 from tyckiting_client import hexagon
+from tyckiting_client import stats
 
 
 class BaseAi:
@@ -62,13 +63,6 @@ class BaseAi:
             if bot.alive:
                 living += 1
         return living
-
-    def get_valid_moves(self, bot):
-        coordinates = set()
-        for radius in range(1, self.config.move + 1):
-            coordinates |= hexagon.get_ring((bot.pos.x, bot.pos.y), radius)
-        coordinates = hexagon.extractValidCoordinates(coordinates, self.config.field_radius)
-        return self.coordinatesToPositions(coordinates)
 
     def get_valid_cannons(self, bot):
         return self.get_positions_in_range(x=0, y=0, radius=self.config.field_radius)
