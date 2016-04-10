@@ -43,7 +43,8 @@ class TriangleShot(object):
 			scoringSources = self._getSourcesHittingTarget(bot_id, events)
 			targetsPos += self._triangulate(scoringSources)
 		self.clear()
-		logging.info('Triangle shot found targets: %s', targetsPos)
+		if targetsPos:
+			logging.info('Triangle shot found targets: %s', targetsPos)
 		return targetsPos
 
 	def _getShipsHit(self, events):

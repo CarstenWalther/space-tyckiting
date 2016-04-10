@@ -6,9 +6,10 @@ BERTA="--ai=berta --name=berta"
 CECILLE="--ai=cecille --name=cecille"
 DORIAN="--ai=dorian --name=dorian"
 EDUARD="--ai=eduard --name=eduard"
+FRIDA="--ai=frida --name=frida"
 
-AI1_ARGS="$DORIAN" 
-AI2_ARGS="$EDUARD --verbose"
+AI1_ARGS="$EDUARD" 
+AI2_ARGS="$FRIDA --verbose"
 
 
 cd server
