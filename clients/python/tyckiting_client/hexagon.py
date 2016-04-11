@@ -8,6 +8,9 @@ DIRECTIONS = [
 	( 0, 1)
 ]
 
+def totalAmountOfHexagons(radius):
+	return 1 + 6 * (radius*(radius+1)/2)
+
 def cube_add(coords, direction):
 	return (coords[0] + direction[0], coords[1] + direction[1])
 

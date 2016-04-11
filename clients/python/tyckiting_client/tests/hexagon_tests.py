@@ -55,3 +55,8 @@ class HexagonTest(unittest.TestCase):
 
     def test_cube_add(self):
         self.assertEqual((2,-1), hexagon.cube_add((1,1), (1,-2)))
+
+    def test_amoundOfHexagon(self):
+        self.assertEqual(7, hexagon.totalAmountOfHexagons(1))
+        self.assertEqual(19, hexagon.totalAmountOfHexagons(2))
+        self.assertEqual(631, hexagon.totalAmountOfHexagons(14))
