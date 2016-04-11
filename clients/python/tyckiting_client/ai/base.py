@@ -104,18 +104,3 @@ class BaseAi:
     def finishLogging(self, result):
         logging.info(self.stats)
         self.stats.writeToFile(result)
-
-    def get_valid_cannons(self, bot):
-        return self.get_positions_in_range(x=0, y=0, radius=self.config.field_radius)
-
-    def get_valid_radars(self, bot):
-        return self.get_positions_in_range(x=0, y=0, radius=self.config.field_radius)
-
-    def get_positions_in_range(self, x=0, y=0, radius=1):
-        for dx in range(-radius, radius+1):
-            for dy in range(max(-radius, -dx-radius), min(radius, -dx+radius)+1):
-                yield messages.Pos(dx+x, dy+y)
-
-    def coordinatesToPositions(self, coords):
-        for coord in coords:
-            yield messages.Pos(coord[0], coord[1])

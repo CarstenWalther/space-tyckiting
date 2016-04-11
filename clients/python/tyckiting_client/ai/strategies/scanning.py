@@ -2,10 +2,10 @@ import random
 import logging
 
 from tyckiting_client import hexagon
-from tyckiting_client.messages import Pos
 from tyckiting_client import actions
+from tyckiting_client import notifications
+from tyckiting_client.messages import Pos
 
-import tyckiting_client.notifications as notifications
 
 class Scanning(object):
 
@@ -19,6 +19,11 @@ class Scanning(object):
 
 	def getPossibleScanPositions(self):
 		raise NotImplementedError()
+
+class RandomScanning(Scanning):
+
+	def getPossibleScanPositions(self):
+		return hexagon.getCircle(radius=self.config.field_radius)
 
 class DontOvershootScanning(Scanning):
 
