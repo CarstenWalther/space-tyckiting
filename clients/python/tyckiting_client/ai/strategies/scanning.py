@@ -3,6 +3,7 @@ import logging
 
 from tyckiting_client import hexagon
 from tyckiting_client.messages import Pos
+from tyckiting_client import actions
 
 import tyckiting_client.notifications as notifications
 
@@ -27,16 +28,21 @@ class DontOvershootScanning(Scanning):
 
 class StatisticalScanning(Scanning):
 
+	def __init__(self, config):
+		super(StatisticalScanning, self).__init__(config)
+		self.createField(config.field_radius)
+
+		notifications.defaultNotificationCenter.registerFunc(notifications.ID_END_ROUND_NOTIFICATION, self.mindOwnScans)
+		notifications.defaultNotificationCenter.registerFunc(notifications.ID_START_ROUND_NOTIFICATION, self.mindEventAndBots)
+
 	def createField(self, radius):
 		self.enemyPossibility = dict()
 		total = hexagon.totalAmountOfHexagons(radius)
 		for pos in hexagon.getCircle(radius):
-			self.enemyPossibility[pos] = 1.0 / total
+			self.enemyPossibility[pos] = self.config.bots / total
 
 	def getNewEnemyPossibility(self, pos):
-		possibleMoveOriginFields = []
-		for r in range(1, self.config.move + 1):
-			possibleMoveOriginFields += hexagon.get_ring(pos, r)
+		possibleMoveOriginFields = hexagon.getCircle(self.config.move, pos[0], pos[1])
 		possibleMoveOriginFields = hexagon.extractValidCoordinates(possibleMoveOriginFields, self.config.field_radius)
 
 		possibilities = [self.enemyPossibility[field] for field in possibleMoveOriginFields]
@@ -49,20 +55,24 @@ class StatisticalScanning(Scanning):
 		self.enemyPossibility = newField
 
 	def mindOwnScans(self, notification):
-		pass
+		actionList = notification.data['actions']
+		for action in actionList:
+			if action.type == 'radar':
+				fields = hexagon.getCircle(self.config.radar, action.x, action.y)
+				fields = hexagon.extractValidCoordinates(fields, self.config.field_radius)
+				for field in fields:
+					self.enemyPossibility[field] = 0.0
 
 	def mindEventAndBots(self, notification):
-		pass
+		bots = notification.data['bots']
+		events = notification.data['events']
 
+		for event in events:
+			if event.event == 'see' or event.event == 'radarEcho':
+				pos = (event.pos.x, event.pos.y)
+				self.enemyPossibility[pos] = 1.0
 
-	def __init__(self, config):
-		super.__init__(config)
-		self.config = config
-		self.createField(config.field_radius)
-
-		notifications.defaultNotificationCenter.registerFunc(notifications.ID_END_ROUND_NOTIFICATION, self.mindOwnScans)
-		notifications.defaultNotificationCenter.registerFunc(notifications.ID_START_ROUND_NOTIFICATION, self.mindEventAndBots)
-
+		self.ageFieldByOneRound()
 
 	def getPossibleScanPositions(self):
 		pass
