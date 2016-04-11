@@ -20,9 +20,9 @@ class BaseAi:
         self.stats = None
 
     def decide(self, bots, events):
-        logging
+        self.logEvents(events)
         response = self.move(bots, events)
-        logging
+        self.logActions(response)
         return response
 
     def move(self, bots, events):
@@ -79,13 +79,13 @@ class BaseAi:
         for action in actions:
             self.stats.analyzeAction(action)
 
-    def startLogging(self, teamBots):
+    def startLogging(self, teamBots, teamName, enemyName):
         teamBotIds = [bot.bot_id for bot in teamBots]
-        self.stats = stats.GameStats(teamBotIds)
+        self.stats = stats.GameStats(teamBotIds, teamName, enemyName)
 
-    def finishLogging(self, result, teamName):
+    def finishLogging(self, result):
         logging.info(self.stats)
-        self.stats.writeToFile(result, teamName)
+        self.stats.writeToFile(result)
 
     def get_valid_cannons(self, bot):
         return self.get_positions_in_range(x=0, y=0, radius=self.config.field_radius)

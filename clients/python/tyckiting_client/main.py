@@ -58,6 +58,7 @@ class TykitingClient():
         self.ai = None
 
         self.team_id = None
+        self.enemyName = None
 
     def on_connected(self, message):
         """
@@ -83,7 +84,7 @@ class TykitingClient():
         Args:
             message: Message from server containing team compositions
         """
-        self.ai.startLogging(message.you.bots)
+        self.ai.startLogging(message.you.bots, self.name, message.other_teams.__next__().name)
         logging.info('Game started')
 
     def on_events(self, message):
@@ -114,7 +115,7 @@ class TykitingClient():
             result = 'defeat'
 
         logging.info('Game ended. %s', resultMessage)
-        self.ai.finishLogging(result, self.name)
+        self.ai.finishLogging(result)
         self.ws.close()
 
     def on_error(self, message):
