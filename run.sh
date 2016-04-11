@@ -1,26 +1,42 @@
-DUMMY="--ai=dummy --name=dummy"
-RAND="--ai=rand --name=random"
 
-ALBERT="--ai=albert --name=albert"
-BERTA="--ai=berta --name=berta"
-CECILLE="--ai=cecille --name=cecille"
-DORIAN="--ai=dorian --name=dorian"
-EDUARD="--ai=eduard --name=eduard"
-FRIDA="--ai=frida --name=frida"
-GERTRUDE="--ai=gertrude --name=gertrude"
+if [ $# -lt 2 ]; then
+    echo 'not enough parameters'
+    echo 'usage:'
+    echo 'run.sh <ai_1> <ai_2> [option]'
+    echo 'options: --verbose --verbose2'
+    echo 'verbosity effects ai_2'
+    exit 1
+fi
 
-AI1_ARGS="$FRIDA" 
-AI2_ARGS="$GERTRUDE --verbose"
+ai_1=$1 
+ai_2=$2
+verbose=$3
+
+client_cmd='python3 cli.py'
+ai_1_cmd="$client_cmd --ai=$ai_1 --name=$ai_1"
+ai_2_cmd="$client_cmd --ai=$ai_2 --name=$ai_2"
+
+platform=$(uname)
+spectator_url=http://localhost:3000/
+
+
+if [ $platform == 'Linux' ]; then
+   browser_cmd='gnome-open'
+elif [ $platform == 'Darwin' ]; then
+   browser_cmd='open'
+else
+	echo 'could not recognize platform'
+	exit 1
+fi
 
 
 cd server
 node start-server.js 1>/dev/null &
 sleep 0.5
-firefox http://localhost:3000/ &
+$browser_cmd $spectator_url
 sleep 3
 
 cd ../clients/python
-python3 cli.py $AI1_ARGS &
-python3 cli.py $AI2_ARGS
-
+$ai_1_cmd &
+$ai_2_cmd $verbose
 sleep 0.1
