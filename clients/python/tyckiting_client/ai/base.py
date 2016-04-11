@@ -4,6 +4,7 @@ from tyckiting_client import messages
 from tyckiting_client import hexagon
 from tyckiting_client import stats
 
+import tyckiting_client.notifications as notifications
 
 class BaseAi:
 
@@ -19,9 +20,26 @@ class BaseAi:
         self.config = config or {}
         self.stats = None
 
+    def notifyAboutNewRound(self, bots, events):
+        data = {
+            'bots': bots,
+            'events': events
+        }
+        notification = notifications.Notification(notifications.ID_START_ROUND_NOTIFICATION, data)
+        notifications.defaultNotificationCenter.send(notification)
+
+    def notifyAboutTakenActions(self, actions):
+        data = {
+            'actions': actions
+        }
+        notification = notifications.Notification(notifications.ID_END_ROUND_NOTIFICATION, data)
+        notifications.defaultNotificationCenter.send(notification)
+
     def decide(self, bots, events):
         self.logEvents(events)
+        self.notifyAboutNewRound(bots, events)
         response = self.move(bots, events)
+        self.notifyAboutTakenActions(response)
         self.logActions(response)
         return response
 
