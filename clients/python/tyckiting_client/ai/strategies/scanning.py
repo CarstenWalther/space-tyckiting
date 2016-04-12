@@ -7,6 +7,8 @@ from tyckiting_client import notifications
 from tyckiting_client.messages import Pos
 
 
+import heapq
+
 class Scanning(object):
 
 	def __init__(self, config):
@@ -79,5 +81,24 @@ class StatisticalScanning(Scanning):
 
 		self.ageFieldByOneRound()
 
-	def getPossibleScanPositions(self):
-		pass
+	def getPossibleScanPositions(self, amount=1):
+		positions = []
+		# min heap
+		totalTiles = hexagon.getCircle(self.config.field_radius)
+
+		while len(positions) < amount:
+			bestPositionHeap = []
+			for pos in totalTiles:
+				fields = hexagon.getCircle(self.config.radar, pos[0], pos[1])
+				fields = set(hexagon.extractValidCoordinates(fields, self.config.field_radius))
+				findProbability = sum([self.enemyPossibility[field] for field in fields])
+				heapq.heappush(bestPositionHeap, (findProbability, pos))
+			
+			pos = heapq.nlargest(1, bestPositionHeap)[0]
+			positions.append(pos)
+
+			fields = hexagon.getCircle(self.config.radar, pos[0], pos[1])
+			fields = set(hexagon.extractValidCoordinates(fields, self.config.field_radius))
+			totalTiles -= fields
+
+		return positions
