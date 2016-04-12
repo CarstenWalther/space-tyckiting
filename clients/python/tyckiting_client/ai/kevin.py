@@ -52,8 +52,6 @@ class Ai(base.BaseAi):
         if target:
             dangerousTiles = hexagon.getCircle(self.config.cannon + 2, target.x, target.y)
             ownBotsAboutToSelfHit = [bot.bot_id for bot in bots if (bot.pos.x, bot.pos.y) in dangerousTiles]
-            if len(ownBotsAboutToSelfHit) > 0:
-            	print('DANGEROUS:', ownBotsAboutToSelfHit)
             endangered |= set(ownBotsAboutToSelfHit)
 
         available = self.livingBotCount(bots) - len(endangered)
