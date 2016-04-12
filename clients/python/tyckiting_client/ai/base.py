@@ -1,4 +1,5 @@
 import logging
+from tyckiting_client.utilities import *
 
 from tyckiting_client import messages
 from tyckiting_client import hexagon
@@ -106,4 +107,5 @@ class BaseAi:
 
     def finishLogging(self, result):
         logging.info(self.stats)
+        log_execution_time_stats()
         self.stats.writeToFile(result)
