@@ -84,7 +84,7 @@ class StatisticalScanning(Scanning):
 	def getPossibleScanPositions(self, amount=1):
 		positions = []
 		# min heap
-		totalTiles = hexagon.getCircle(self.config.field_radius)
+		totalTiles = set(hexagon.getCircle(self.config.field_radius))
 
 		while len(positions) < amount:
 			bestPositionHeap = []
@@ -94,11 +94,12 @@ class StatisticalScanning(Scanning):
 				findProbability = sum([self.enemyPossibility[field] for field in fields])
 				heapq.heappush(bestPositionHeap, (findProbability, pos))
 			
-			pos = heapq.nlargest(1, bestPositionHeap)[0]
+			pos = heapq.nlargest(1, bestPositionHeap)[0][1]
 			positions.append(pos)
 
 			fields = hexagon.getCircle(self.config.radar, pos[0], pos[1])
 			fields = set(hexagon.extractValidCoordinates(fields, self.config.field_radius))
 			totalTiles -= fields
 
+		logging.info('  finished')
 		return positions
