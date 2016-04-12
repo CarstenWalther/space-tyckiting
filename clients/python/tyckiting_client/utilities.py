@@ -17,7 +17,7 @@ def log_execution_time(function):
 		
 		execTimes[funcName].append(execTime)
 		
-		logging.info('execution of {:s}: {:f}ms'.format(funcName, execTime))
+		#logging.info('execution of {:s}: {:f}ms'.format(funcName, execTime))
 		return result
 	return new_function
 
