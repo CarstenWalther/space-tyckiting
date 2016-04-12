@@ -1,35 +1,43 @@
 import random
 import logging
+import heapq
+import time
 
 from tyckiting_client import hexagon
 from tyckiting_client import actions
 from tyckiting_client import notifications
 from tyckiting_client.messages import Pos
 
-
-import heapq
+def log_execution_time(function):
+	def new_function(*args, **kwargs):
+		start = time.time()
+		result = function(*args, **kwargs)
+		end = time.time()
+		logging.info('execution of {:s}: {:f}ms'.format(function.__name__, (end-start)*1000))
+		return result
+	return new_function
 
 class Scanning(object):
 
 	def __init__(self, config):
 		self.config = config
 
-	def getScanPosition(self):
-		coords = self.getPossibleScanPositions()
+	def getScanPosition(self, amount=1):
+		coords = self.getPossibleScanPositions(amount)
 		coord = random.choice(list(coords))
 		return Pos(coord[0], coord[1])
 
-	def getPossibleScanPositions(self):
+	def getPossibleScanPositions(self, amount=1):
 		raise NotImplementedError()
 
 class RandomScanning(Scanning):
 
-	def getPossibleScanPositions(self):
+	def getPossibleScanPositions(self, amount=1):
 		return hexagon.getCircle(radius=self.config.field_radius)
 
 class DontOvershootScanning(Scanning):
 
-	def getPossibleScanPositions(self):
+	def getPossibleScanPositions(self, amount=1):
 		return hexagon.getCircle(radius=self.config.field_radius-self.config.radar)
 
 
@@ -61,45 +69,60 @@ class StatisticalScanning(Scanning):
 			newField[pos] = self.getNewEnemyPossibility(pos)
 		self.enemyPossibility = newField
 
+	@log_execution_time
 	def mindOwnScans(self, notification):
 		actionList = notification.data['actions']
 		for action in actionList:
 			if action.type == 'radar':
 				fields = hexagon.getCircle(self.config.radar, action.x, action.y)
-				fields = hexagon.extractValidCoordinates(fields, self.config.field_radius)
 				for field in fields:
-					self.enemyPossibility[field] = 0.0
+					if field in self.enemyPossibility:
+						self.enemyPossibility[field] = 0.0
 
+	@log_execution_time
 	def mindEventAndBots(self, notification):
 		bots = notification.data['bots']
 		events = notification.data['events']
+
+		for bot in bots:
+			fields = hexagon.getCircle(self.config.see, bot.pos.x, bot.pos.y)
+			for field in fields:
+				if field in self.enemyPossibility:
+					self.enemyPossibility[field] = 0.0
 
 		for event in events:
 			if event.event == 'see' or event.event == 'radarEcho':
 				pos = (event.pos.x, event.pos.y)
 				self.enemyPossibility[pos] = 1.0
+			elif event.event == 'die':
+				# think about cleaning the possibilities in the area
+				pass
+
 
 		self.ageFieldByOneRound()
 
+	@log_execution_time
 	def getPossibleScanPositions(self, amount=1):
 		positions = []
 		# min heap
 		totalTiles = set(hexagon.getCircle(self.config.field_radius))
+		usedTiles = set()
 
 		while len(positions) < amount:
-			bestPositionHeap = []
+			bestPosition = None
+			bestPositionScore = -1
+
 			for pos in totalTiles:
 				fields = hexagon.getCircle(self.config.radar, pos[0], pos[1])
 				fields = set(hexagon.extractValidCoordinates(fields, self.config.field_radius))
+				fields -= usedTiles
+				
 				findProbability = sum([self.enemyPossibility[field] for field in fields])
-				heapq.heappush(bestPositionHeap, (findProbability, pos))
+				if findProbability > bestPositionScore:
+					bestPosition = pos
+					bestPositionScore = findProbability
 			
-			pos = heapq.nlargest(1, bestPositionHeap)[0][1]
-			positions.append(pos)
+			positions.append(bestPosition)
+			usedTiles |= set(hexagon.getCircle(self.config.radar, pos[0], pos[1]))
 
-			fields = hexagon.getCircle(self.config.radar, pos[0], pos[1])
-			fields = set(hexagon.extractValidCoordinates(fields, self.config.field_radius))
-			totalTiles -= fields
-
-		logging.info('  finished')
 		return positions
