@@ -55,13 +55,13 @@ class StatisticalScanning(Scanning):
 		possibilities = [self.enemyPossibility[field] for field in possibleMoveOriginFields]
 		return sum(possibilities) / len(possibilities)
 
+	@log_execution_time
 	def ageFieldByOneRound(self):
 		newField = dict()
 		for pos in hexagon.getCircle(self.config.field_radius):
 			newField[pos] = self.getNewEnemyPossibility(pos)
 		self.enemyPossibility = newField
 
-	@log_execution_time
 	def mindOwnScans(self, notification):
 		actionList = notification.data['actions']
 		for action in actionList:
@@ -71,7 +71,6 @@ class StatisticalScanning(Scanning):
 					if field in self.enemyPossibility:
 						self.enemyPossibility[field] = 0.0
 
-	@log_execution_time
 	def mindEventAndBots(self, notification):
 		bots = notification.data['bots']
 		events = notification.data['events']
@@ -107,7 +106,7 @@ class StatisticalScanning(Scanning):
 			bestPosition = None
 			bestPositionScore = -1
 
-			for pos in totalTiles:
+			for pos in random.sample(totalTiles, int(len(totalTiles)/5)):
 				fields = hexagon.getCircle(self.config.radar, pos[0], pos[1])
 				fields = set(hexagon.extractValidCoordinates(fields, self.config.field_radius))
 				fields = fields - usedTiles
