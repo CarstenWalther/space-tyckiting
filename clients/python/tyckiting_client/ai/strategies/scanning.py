@@ -101,6 +101,9 @@ class StatisticalScanning(Scanning):
 
 		self.ageFieldByOneRound()
 
+	def getScanPosition(self, amount=1):
+		return self.getPossibleScanPositions(amount)[0]
+
 	@log_execution_time
 	def getPossibleScanPositions(self, amount=1):
 		positions = []
@@ -115,14 +118,14 @@ class StatisticalScanning(Scanning):
 			for pos in totalTiles:
 				fields = hexagon.getCircle(self.config.radar, pos[0], pos[1])
 				fields = set(hexagon.extractValidCoordinates(fields, self.config.field_radius))
-				fields -= usedTiles
+				fields = fields - usedTiles
 				
 				findProbability = sum([self.enemyPossibility[field] for field in fields])
 				if findProbability > bestPositionScore:
 					bestPosition = pos
 					bestPositionScore = findProbability
 			
-			positions.append(bestPosition)
-			usedTiles |= set(hexagon.getCircle(self.config.radar, pos[0], pos[1]))
+			positions.append(Pos(*bestPosition))
+			usedTiles |= set(hexagon.getCircle(self.config.radar, bestPosition[0], bestPosition[1]))
 
 		return positions

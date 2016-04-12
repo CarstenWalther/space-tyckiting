@@ -8,7 +8,7 @@ from tyckiting_client.ai.strategies import scanning
 
 '''
 Rules:
-like nothing before .. statistical scanning
+like haegar without overscanning xD
 '''
 
 class Ai(base.BaseAi):
@@ -29,7 +29,10 @@ class Ai(base.BaseAi):
         if self.livingBotCount(bots) == 3 and len(targetsPos) > 0 and not endangered:
             return self.triShot.shoot(bots, targetsPos[0])
 
+        scanningBots = []
         for bot in bots:
+            action = None
+
             if not bot.alive:
                 continue
             if bot.bot_id in endangered:
@@ -39,9 +42,16 @@ class Ai(base.BaseAi):
                 targetPos = targetsPos[0]
                 action = actions.Cannon(bot_id=bot.bot_id, x=targetPos.x, y=targetPos.y)
             else:
-                scanPos = self.scanning.getScanPosition()
-                action = actions.Radar(bot_id=bot.bot_id, x=scanPos.x, y=scanPos.y)
+                scanningBots.append(bot)
+
+            if action:
+                response.append(action)
+
+        scanningPositions = self.scanning.getPossibleScanPositions(len(scanningBots))
+        for bot, scanPos in zip(scanningBots, scanningPositions):
+            action = actions.Radar(bot_id=bot.bot_id, x=scanPos.x, y=scanPos.y)
             response.append(action)
+        
         return response
 
 
