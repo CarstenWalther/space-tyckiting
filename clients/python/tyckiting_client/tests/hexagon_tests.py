@@ -60,3 +60,13 @@ class HexagonTest(unittest.TestCase):
         self.assertEqual(7, hexagon.totalAmountOfHexagons(1))
         self.assertEqual(19, hexagon.totalAmountOfHexagons(2))
         self.assertEqual(631, hexagon.totalAmountOfHexagons(14))
+
+    def test_mirrorCoordinate_same_point(self):
+        mirroredPoint = hexagon.mirrorCoordinate((1,1), (1,1))
+        expectedMirroredPoint = (1,1)
+        self.assertEqual(mirroredPoint, expectedMirroredPoint)
+
+    def test_mirrorCoordinate_different_point(self):
+        mirroredPoint = hexagon.mirrorCoordinate((0,1), (3,3))
+        expectedMirroredPoint = (6,5)
+        self.assertEqual(mirroredPoint, expectedMirroredPoint)

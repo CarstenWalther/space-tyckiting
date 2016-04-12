@@ -14,6 +14,9 @@ def totalAmountOfHexagons(radius):
 def cube_add(coords, direction):
 	return (coords[0] + direction[0], coords[1] + direction[1])
 
+def cube_substract(coords, direction):
+	return (coords[0] - direction[0], coords[1] - direction[1])
+
 def neighbor(coords, direction):
 	return cube_add(coords, DIRECTIONS[direction])
 
@@ -46,3 +49,7 @@ def getCircle(radius=1, x=0, y=0):
 	for dx in range(-radius, radius+1):
 		for dy in range(max(-radius, -dx-radius), min(radius, -dx+radius)+1):
 			yield (dx+x, dy+y)
+
+def mirrorCoordinate(coordinate, mirrorPoint=(0,0)):
+	direction = cube_substract(mirrorPoint, coordinate)
+	return cube_add(mirrorPoint, direction)
