@@ -6,6 +6,8 @@ from tyckiting_client import stats
 
 import tyckiting_client.notifications as notifications
 
+from tyckiting_client.utilities import *
+
 class BaseAi:
 
     def __init__(self, team_id, config=None):
@@ -35,6 +37,7 @@ class BaseAi:
         notification = notifications.Notification(notifications.ID_END_ROUND_NOTIFICATION, data)
         notifications.defaultNotificationCenter.send(notification)
 
+    @log_execution_time
     def decide(self, bots, events):
         self.logEvents(events)
         self.notifyAboutNewRound(bots, events)
