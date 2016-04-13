@@ -73,8 +73,6 @@ class BaseAi:
             elif event.event == 'damaged':
                 #endangered.add(event.bot_id)
                 pass
-        if endangered:
-            logging.info('endangered bots: %s', endangered)
         return endangered
 
     def getTargets(self, events):

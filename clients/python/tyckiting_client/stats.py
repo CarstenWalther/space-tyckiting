@@ -21,7 +21,7 @@ class GameStats(object):
 	
 	def analyzeEvent(self, event):
 		if event.event == 'hit':
-			logging.info('hit bot %d', event.bot_id)
+			logging.info('Hit bot %d', event.bot_id)
 			if event.bot_id in self.friendlyBotIds:
 				logging.info('outch, selfhit')
 				self.selfHitCount += 1
@@ -50,8 +50,10 @@ class GameStats(object):
 			self.moveCount += 1
 		elif action.type == 'radar':
 			self.radarCount += 1
+			logging.info('Radar at (%d,%d)', action.x, action.y)
 		elif action.type == 'cannon':
 			self.shotCount += 1
+			logging.info('Shoot at (%d,%d)', action.x, action.y)
 
 	def writeToFile(self, result):
 		filename = 'logs/' + self.teamName + '.txt'

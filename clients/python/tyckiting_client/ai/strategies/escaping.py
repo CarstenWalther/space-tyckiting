@@ -36,7 +36,6 @@ class StraightDistance2Escaping(Escaping):
 		for direction in range(6):
 			coord = hexagon.neighbor(center, direction)
 			coord = hexagon.neighbor(coord, direction)
-			logging.info('Coord %d %d', coord[0], coord[1])
 			coordinates.add(coord)
 		coordinates = hexagon.extractValidCoordinates(coordinates, self.config.field_radius)
 		return coordinates

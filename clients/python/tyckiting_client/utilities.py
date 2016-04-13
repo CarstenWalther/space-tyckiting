@@ -1,23 +1,23 @@
 import time
 import logging
 
+COUNT = 0
+SUM = 1
+MAX = 2
 
-execTimes = dict()
+functionStats = dict()
 
 def log_execution_time(function):
 	def new_function(*args, **kwargs):
 		start = time.time()
 		result = function(*args, **kwargs)
-		end = time.time()
-
-		execTime = (end-start)*1000
+		execTime = (time.time() - start) * 1000
 		funcName = function.__name__
-		if not funcName in execTimes:
-			execTimes[funcName] = []
-		
-		execTimes[funcName].append(execTime)
-		
-		#logging.info('execution of {:s}: {:f}ms'.format(funcName, execTime))
+		stats = functionStats.setdefault(funcName, [0,0,0])
+		stats[COUNT] += 1
+		stats[SUM] += execTime
+		if execTime > stats[MAX]:
+			stats[MAX] = execTime
 		return result
 	return new_function
 
@@ -25,16 +25,19 @@ def log_execution_time_stats():
 	logging.info('Execution Times:')
 	funcStats = []
 
-	for func in execTimes:
-		totalTime = sum(execTimes[func])
-		count = len(execTimes[func])
+	for func,values in functionStats.items():
+		totalTime = values[SUM]
+		count = values[COUNT]
+		maximum = values[MAX]
 		avg = totalTime / count
-		
-		funcStats.append( (totalTime, avg, count, func) )
+		funcStats.append( (totalTime, avg, maximum, count, func) )
 
+	printExecTimeTable(funcStats)
+
+def printExecTimeTable(funcStats):
 	funcStats = sorted(funcStats, reverse=True)
-	logging.info('{:^12}|{:^12}|{:^12}|{:^12}'.format('total ms', 'avg ms', 'count', 'function'))
+	logging.info('{:^10}|{:^10}|{:^10}|{:^10}|{:^10}'.format('total ms', 'avg ms', 'max ms', 'count', 'function'))
 	logging.info('-'*51)
-	for total, avg, count, func in funcStats:
+	for total, avg, count, maximum, func in funcStats:
 		func = 'total' if func == 'decide' else func
-		logging.info('{: 12.2f}|{: 12.2f}|{: 12.2f}| {:s}'.format(total, avg, count, func))
+		logging.info('{: 10.2f}|{: 10.2f}|{: 10.2f}|{: 10.2f}| {:s}'.format(total, avg, count, maximum, func))
