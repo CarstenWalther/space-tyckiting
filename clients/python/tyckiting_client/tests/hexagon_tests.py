@@ -70,3 +70,14 @@ class HexagonTest(unittest.TestCase):
         mirroredPoint = hexagon.mirrorCoordinate((0,1), (3,3))
         expectedMirroredPoint = (6,5)
         self.assertEqual(mirroredPoint, expectedMirroredPoint)
+
+    def test_distance(self):
+        pos1 = [-2, -7]
+        pos2 = [2, 1]
+        
+        calculated_distance = hexagon.distance(pos1, pos2)
+        expected_distance = 12
+        self.assertEqual(calculated_distance, expected_distance)
+        
+        calculated_distance = hexagon.distance(pos2, pos1)
+        self.assertEqual(calculated_distance, expected_distance)

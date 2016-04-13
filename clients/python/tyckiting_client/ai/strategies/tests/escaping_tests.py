@@ -63,3 +63,17 @@ class EscapingTest(unittest.TestCase):
 			(14,-1),
 		])
 		self.assertEqual(positions, expected_positions)
+
+	def testAvoidSelfhit(self):
+		enemy_pos = [2, -1]
+
+		movement = escaping.AvoidSelfhit(self.config)
+		movement.setEnemy(enemy_pos)
+
+		allMoves = set(movement.getPossibleMoves(self.bot))
+		expectedMoves = set((
+			(4, 1),
+			(2, 3),
+			(0, 3),
+		))
+		self.assertEqual(allMoves, expectedMoves)

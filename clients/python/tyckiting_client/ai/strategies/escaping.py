@@ -36,6 +36,36 @@ class StraightDistance2Escaping(Escaping):
 		for direction in range(6):
 			coord = hexagon.neighbor(center, direction)
 			coord = hexagon.neighbor(coord, direction)
+			logging.info('Coord %d %d', coord[0], coord[1])
 			coordinates.add(coord)
+		coordinates = hexagon.extractValidCoordinates(coordinates, self.config.field_radius)
+		return coordinates
+
+class AvoidSelfhit(Escaping):
+
+	def setEnemy(self, enemy_pos):
+		self.enemy_pos = enemy_pos
+
+	
+
+	def getPossibleMoves(self, bot):
+		logging.info('AvoidSelfhit from enemy in %s', bot.bot_id, self.enemy_pos)
+		coordinates = set()
+		center = (bot.pos.x, bot.pos.y)
+		max_distance = 0
+
+		for direction in range(6):
+			coord = hexagon.neighbor(center, direction)
+			coord = hexagon.neighbor(coord, direction)
+			distance = hexagon.distance(coord, self.enemy_pos)
+
+			if distance == max_distance:
+				coordinates.add(coord)
+
+			elif distance > max_distance:
+				coordinates.clear()
+				coordinates.add(coord)
+				max_distance = distance
+
 		coordinates = hexagon.extractValidCoordinates(coordinates, self.config.field_radius)
 		return coordinates

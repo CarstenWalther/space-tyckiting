@@ -53,3 +53,15 @@ def getCircle(radius=1, x=0, y=0):
 def mirrorCoordinate(coordinate, mirrorPoint=(0,0)):
 	direction = cube_substract(mirrorPoint, coordinate)
 	return cube_add(mirrorPoint, direction)
+
+def distance(pos1, pos2):
+	z1 = -pos1[0] - pos1[1]
+	z2 = -pos2[0] - pos2[1]
+
+	x_dist = abs(pos2[0] - pos1[0])
+	y_dist = abs(pos2[1] - pos1[1])
+	z_dist = abs(z2 - z1)
+
+	distance = max(x_dist, y_dist, z_dist)
+
+	return distance
