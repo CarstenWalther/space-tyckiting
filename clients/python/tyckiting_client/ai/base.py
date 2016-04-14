@@ -67,13 +67,22 @@ class BaseAi:
         endangered = set()
         for event in events:
             if event.event == 'see':
-                endangered.add(event.source)
+                self.addIfNotDead(endangered, event.source, events)
             elif event.event == 'detected':
                 endangered.add(event.bot_id)
             elif event.event == 'damaged':
                 #endangered.add(event.bot_id)
                 pass
         return endangered
+
+    def addIfNotDead(self, endangeredBots, botId, events):
+        dead = False
+        for event in events:
+            if event.event == 'die' and event.bot_id == botId:
+                dead = True
+                break
+        if not dead:
+            endangeredBots.add(botId)
 
     def getTargets(self, events):
         targets = []

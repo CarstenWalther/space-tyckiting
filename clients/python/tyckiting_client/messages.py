@@ -92,6 +92,7 @@ class Error(Message):
     def __init__(self, data, **kwargs):
         self.data = data
 
+
 TYPE_MAP = {
     'connected': Connected,
     'start': Start,

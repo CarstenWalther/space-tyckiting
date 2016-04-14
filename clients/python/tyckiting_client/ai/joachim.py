@@ -1,4 +1,5 @@
 import random
+import logging
 
 from tyckiting_client.ai import base
 from tyckiting_client import actions
@@ -30,12 +31,16 @@ class Ai(base.BaseAi):
         endangered = self.getEndangeredBots(events)
         available = self.livingBotCount(bots) - len(endangered)
 
+        logging.info('living:' + str(self.livingBotCount(bots)) + '\nendangered:' + str(endangered) + '\navailable:' + str(available))
+
         shooting = False
         if len(targetsPos) > 0 and available:
             shooting = True
             shotCoords = self.shooting.getShootPositions(targetsPos[0], available)
-        else:
+            logging.info('shooting request {} got {}'.format(available, shotCoords))
+        elif available:
             scanCoords = self.scanning.getPossibleScanPositions(available)
+
 
         for bot in bots:
             if not bot.alive:
@@ -44,6 +49,7 @@ class Ai(base.BaseAi):
                 newPos = self.escaping.getMove(bot)
                 action = actions.Move(bot_id=bot.bot_id, x=newPos.x, y=newPos.y)
             elif shooting:
+                logging.info('shoot')
                 shotCoord = shotCoords.pop()
                 action = actions.Cannon(bot_id=bot.bot_id, x=shotCoord[0], y=shotCoord[1])
             else:
