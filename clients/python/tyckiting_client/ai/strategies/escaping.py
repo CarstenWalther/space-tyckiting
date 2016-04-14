@@ -46,6 +46,7 @@ class AvoidSelfhit(Escaping):
 		self.enemy_pos = enemy_pos
 
 	def getPossibleMoves(self, bot):
+		logging.info('AvoidSelfhit on bot %d from enemy in %s', bot.bot_id, self.enemy_pos)
 		coordinates = set()
 		center = (bot.pos.x, bot.pos.y)
 		max_distance = 0
