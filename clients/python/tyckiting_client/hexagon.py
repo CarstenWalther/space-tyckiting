@@ -31,17 +31,19 @@ def get_ring(coords=(0,0), radius=1):
 			cube = neighbor(cube, i)
 	return results
 
-def isInField(coords, radius):
+def isInField(coords, radius, center=(0,0)):
 	x,y = coords
 	z = -x-y
-	return -radius <= x <= radius and \
-			-radius <= y <= radius and \
-			-radius <= z <= radius
+	centerX, centerY = center
+	centerZ = -centerX-centerY
+	return -radius <= x-centerX <= radius and \
+			-radius <= y-centerY <= radius and \
+			-radius <= z-centerZ <= radius
 
-def extractValidCoordinates(coordinates, radius):
+def extractValidCoordinates(coordinates, radius, center=(0,0)):
 	validCoordinates = set()
 	for coord in coordinates:
-		if isInField(coord, radius):
+		if isInField(coord, radius, center):
 			validCoordinates.add(coord)
 	return validCoordinates
 

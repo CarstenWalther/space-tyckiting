@@ -81,3 +81,20 @@ class HexagonTest(unittest.TestCase):
         
         calculated_distance = hexagon.distance(pos2, pos1)
         self.assertEqual(calculated_distance, expected_distance)
+
+    def test_isInField_2_2_is_in_radius_2(self):
+        result = hexagon.isInField((2,2), radius=2)
+        expectedResult = False
+        self.assertEqual(result, expectedResult)
+
+    def test_extractValidCoordinates_center(self):
+        coords = [(0,0), (1,0), (2,0), (3,0), (1,1), (2,2), (-2,2), (1,-2), (2,-4)]
+        validCoords = hexagon.extractValidCoordinates(coords, radius=2)
+        expectedValidCoords = set([(0,0), (1,0), (2,0), (1,1), (-2,2), (1,-2)])
+        self.assertEqual(validCoords, expectedValidCoords)
+
+    def test_extractValidCoordinates_with_offset(self):
+        coords = [(2,1), (3,1), (4,1), (5,1), (2,0), (2,-1), (2,-2), (3,-1), (4,-3)]
+        validCoords = hexagon.extractValidCoordinates(coords, radius=2, center=(2,1))
+        expectedValidCoords = set([(2,1), (3,1), (4,1), (2,0), (2,-1), (3,-1)])
+        self.assertEqual(validCoords, expectedValidCoords)
