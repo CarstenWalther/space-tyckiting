@@ -31,7 +31,7 @@ fi
 
 
 cd server
-node start-server.js 1>/dev/null &
+node start-server.js -o true 1>/dev/null &
 sleep 0.5
 $browser_cmd $spectator_url
 sleep 3
