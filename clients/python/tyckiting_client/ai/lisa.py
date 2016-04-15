@@ -71,7 +71,7 @@ class Ai(base.BaseAi):
                 continue
             if bot.bot_id in selfhit:
                 self.avoid_selfhit.setEnemy(target)
-                newPos = self.avoid_selfhit.getMove(self.config)
+                newPos = self.avoid_selfhit.getMove(bot)
                 action = actions.Move(bot_id=bot.bot_id, x=newPos.x, y=newPos.y)
 
             elif bot.bot_id in endangered:
