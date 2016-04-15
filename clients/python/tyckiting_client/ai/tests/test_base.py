@@ -16,6 +16,19 @@ class BaseTest(unittest.TestCase):
 		expectedEndangeredBots = set()
 		self.assertEqual(endangeredBots, expectedEndangeredBots)
 
+	def test_getEndangeredBots_bot_detected_but_is_dead(self):
+		data = json.loads('[{"event":"move","botId":5,"pos":{"y":12,"x":-10}}, \
+			{"event":"damaged","botId":5,"damage":1}, \
+			{"event":"radarEcho","pos":{"y":-1,"x":3}}, \
+			{"event":"radarEcho","pos":{"y":0,"x":6}}, \
+			{"event":"detected","botId":5}, \
+			{"event":"die","botId":5}]')
+		events = list(map(lambda e: messages.Event(**e), data or []))
+		ai = base.BaseAi(messages.Config())
+		endangeredBots = ai.getEndangeredBots(events)
+		expectedEndangeredBots = set()
+		self.assertEqual(endangeredBots, expectedEndangeredBots)
+
 	def test_addIfNotDead_bot_is_dead(self):
 		data = json.loads('[{"event":"move","botId":5,"pos":{"x":2,"y":-4}},{"event":"hit","source":4,"botId":5}, \
 			{"event":"damaged","botId":5,"damage":1},{"event":"see","source":5,"botId":0,"pos":{"x":2,"y":-3}}, \

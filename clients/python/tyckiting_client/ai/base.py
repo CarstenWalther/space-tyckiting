@@ -69,9 +69,9 @@ class BaseAi:
             if event.event == 'see':
                 self.addIfNotDead(endangered, event.source, events)
             elif event.event == 'detected':
-                endangered.add(event.bot_id)
+                self.addIfNotDead(endangered, event.bot_id, events)
             elif event.event == 'damaged':
-                #endangered.add(event.bot_id)
+                #self.addIfNotDead(endangered, event.bot_id, events)
                 pass
         return endangered
 
