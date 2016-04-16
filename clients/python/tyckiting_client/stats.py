@@ -68,7 +68,7 @@ class GameStats(object):
 		self.addGameStats(data, result)
 		file.seek(0)
 		file.write(json.dumps(data))
-		file.truncate
+		file.truncate()
 		fcntl.flock(file, fcntl.LOCK_UN)
 		file.close()
 
