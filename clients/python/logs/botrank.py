@@ -100,4 +100,5 @@ def rank_bots():
 	for score, name in sorted(zip(scores, names), reverse=True):
 		print(name, score)
 
-rank_bots()
+if __name__ == '__main__':
+	rank_bots()

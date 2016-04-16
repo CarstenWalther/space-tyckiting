@@ -2,6 +2,11 @@ import random
 import logging
 import heapq
 
+# debug
+import scipy.misc
+import math
+import numpy as np
+
 from tyckiting_client import hexagon
 from tyckiting_client import actions
 from tyckiting_client import notifications
@@ -48,6 +53,9 @@ class StatisticalScanning(Scanning):
 		for pos in hexagon.getCircle(radius):
 			self.enemyPossibility[pos] = self.config.bots / total
 
+		#self.img_count = 0
+		#self.outputFieldAsImage(self.enemyPossibility)
+
 	def getNewEnemyPossibility(self, pos):
 		possibleMoveOriginFields = hexagon.getCircle(self.config.move, pos[0], pos[1])
 		possibleMoveOriginFields = hexagon.extractValidCoordinates(possibleMoveOriginFields, self.config.field_radius)
@@ -55,12 +63,25 @@ class StatisticalScanning(Scanning):
 		possibilities = [self.enemyPossibility[field] for field in possibleMoveOriginFields]
 		return sum(possibilities) / len(possibilities)
 
+	def outputFieldAsImage(self, field):
+		filename = 'statfield_{:03d}.png'.format(self.img_count)
+		self.img_count += 1
+		dimension = self.config.field_radius * 2
+		
+		img = np.zeros((dimension + 2, dimension + 2))
+		for pos in field.keys():
+			x, y = pos
+			img[int(x+dimension/2), int(y+dimension/2)] = field[pos]
+
+		scipy.misc.toimage(img).save(filename)
+
 	@log_execution_time
 	def ageFieldByOneRound(self):
 		newField = dict()
 		for pos in hexagon.getCircle(self.config.field_radius):
 			newField[pos] = self.getNewEnemyPossibility(pos)
 		self.enemyPossibility = newField
+		#self.outputFieldAsImage(newField)
 
 	def mindOwnScans(self, notification):
 		actionList = notification.data['actions']
@@ -88,7 +109,6 @@ class StatisticalScanning(Scanning):
 			elif event.event == 'die':
 				# think about cleaning the possibilities in the area
 				pass
-
 
 		self.ageFieldByOneRound()
 
