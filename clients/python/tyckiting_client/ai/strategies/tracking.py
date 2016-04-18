@@ -7,6 +7,7 @@ from tyckiting_client import hexagon
 STRAIGHT_DISTANCE2_PATTERN = {'stay':0, 'dist1':0, 'dist2Straight':2, 'dist2Curve':0}
 BALANCED_PATTERN = {'stay':1, 'dist1':0, 'dist2Straight':2, 'dist2Curve':2}
 MOVE_RADIUS = 2
+SHOOT_RADIUS = 1
 
 class Tracker(object):
 
@@ -16,7 +17,7 @@ class Tracker(object):
 	provide shoot coordiantes by maximizing the damage to 
 	the enemy based on predicted movement patterns
 
-	TODO: take edges into account
+	TODO: attention to edges and friendly ships
 	'''
 
 	def __init__(self, pattern):
@@ -28,7 +29,16 @@ class Tracker(object):
 	def getTarget(self):
 		return self.trackedTarget
 
-	def getShootCoordinates(self, amount):
+	def getShootCoordinates(self, amount, target=None):
+		if not target:
+			target = self.getTarget()
+		if not target:
+			return None
+		field = self.createField()
+		return field.getTargets(amount, SHOOT_RADIUS)
+
+	def createField(self):
+		#TODO
 		pass
 
 	def _update(self, notification):
@@ -40,7 +50,7 @@ class Tracker(object):
 				newPositions.append(event.pos)
 		self._updateCounter(newPositions)
 		self.knownEnemyPositions = newPositions
-		self._determineTrackedTarget(newPositions, self.trackedTarget)
+		self._updateTrackedTarget(newPositions, self.trackedTarget)
 
 	def _updateCounter(self, newPositions):
 		usedPositionStart = set()
@@ -78,14 +88,15 @@ class Tracker(object):
 			else:
 				return 'dist2Curve'
 
-	def _determineTrackedTarget(self, targetsPos, center):
+	def _updateTrackedTarget(self, targetsPos, center):
 		if len(targetsPos) == 0:
-			return None
-		if center
+			target = None
+		elif center:
 			validPositions = hexagon.extractValidCoordinates(targetsPos, self.config.move, center)
 			if len(validPositions) > 0:
-				return validPositions.pop()
+				target = validPositions[0]
 		else:
-			return targetsPos.pop()
+			target = targetsPos[0]
+		self.trackedTarget = target
 
 
