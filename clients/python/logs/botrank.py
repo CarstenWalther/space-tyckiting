@@ -11,8 +11,7 @@ def maximalEigenvector(A):
 	return abs(np.real(v[:n,0])/np.linalg.norm(v[:n,0],1))
 
 def getTeleMatrix(A,m):
-	""" return the matrix M
-    	of the web described by A """
+	""" normalizes the matrix and adds dumping factor """
 	n = A.shape[1]
 	S = np.ones((n,n))/n
 	return (1-m)*A+m*S
