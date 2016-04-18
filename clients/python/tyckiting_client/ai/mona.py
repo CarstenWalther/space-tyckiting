@@ -32,7 +32,7 @@ class Ai(base.BaseAi):
         endangered = self.getEndangeredBots(events)
         livingCount = self.livingBotCount(bots)
         available = livingCount - len(endangered)
-        self.targetPos = self.determineTrackedTarget(targetsPos)
+        self.targetPos = self.determineTrackedTarget(targetsPos, self.targetPos)
 
         pendingTrackScan = False
         if self.targetPos and livingCount > 1 and available:
@@ -65,12 +65,13 @@ class Ai(base.BaseAi):
         
         return response
 
-    def determineTrackedTarget(self, targetsPos):
+    def determineTrackedTarget(self, targetsPos, center):
         if len(targetsPos) == 0:
             return None
-        validPositions = hexagon.extractValidCoordinates(targetsPos, self.config.move)
-        if len(validPositions) > 0:
-            return validPositions.pop()
+        if center:
+            validPositions = hexagon.extractValidCoordinates(targetsPos, self.config.move, center)
+            if len(validPositions) > 0:
+                return validPositions.pop()
         else:
             return targetsPos.pop()
 
