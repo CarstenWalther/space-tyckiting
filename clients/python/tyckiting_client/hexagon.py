@@ -67,3 +67,9 @@ def distance(pos1, pos2):
 	distance = max(x_dist, y_dist, z_dist)
 
 	return distance
+
+def isStraightLine(pos1, pos2):
+	dx = pos1[0] - pos2[0]
+	dy = pos1[1] - pos2[1]
+	dz = dx + dy
+	return dx == 0 or dy == 0 or dz == 0

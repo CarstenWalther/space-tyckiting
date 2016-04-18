@@ -82,6 +82,17 @@ class HexagonTest(unittest.TestCase):
         calculated_distance = hexagon.distance(pos2, pos1)
         self.assertEqual(calculated_distance, expected_distance)
 
+    def test_distance_zero(self):
+        pos1 = [2, 1]
+        pos2 = [2, 1]
+        
+        calculated_distance = hexagon.distance(pos1, pos2)
+        expected_distance = 0
+        self.assertEqual(calculated_distance, expected_distance)
+        
+        calculated_distance = hexagon.distance(pos2, pos1)
+        self.assertEqual(calculated_distance, expected_distance)
+
     def test_isInField_2_2_is_in_radius_2(self):
         result = hexagon.isInField((2,2), radius=2)
         expectedResult = False
@@ -98,3 +109,23 @@ class HexagonTest(unittest.TestCase):
         validCoords = hexagon.extractValidCoordinates(coords, radius=2, center=(2,1))
         expectedValidCoords = set([(2,1), (3,1), (4,1), (2,0), (2,-1), (3,-1)])
         self.assertEqual(validCoords, expectedValidCoords)
+
+    def test_isStraightLine_dx(self):
+        result = hexagon.isStraightLine((0,2), (2,2))
+        expectedResult = True
+        self.assertEqual(result, expectedResult)
+
+    def test_isStraightLine_dy(self):
+        result = hexagon.isStraightLine((2,2), (2,3))
+        expectedResult = True
+        self.assertEqual(result, expectedResult)
+
+    def test_isStraightLine_dz(self):
+        result = hexagon.isStraightLine((2,1), (4,-1))
+        expectedResult = True
+        self.assertEqual(result, expectedResult)
+
+    def test_isStraightLine_not_straight(self):
+        result = hexagon.isStraightLine((-1,0), (2,2))
+        expectedResult = False
+        self.assertEqual(result, expectedResult)
