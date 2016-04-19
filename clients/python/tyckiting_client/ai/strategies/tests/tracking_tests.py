@@ -1,6 +1,8 @@
 import unittest
 
 from tyckiting_client.ai.strategies import tracking
+from tyckiting_client import hexagon
+
 
 class TrackingTest(unittest.TestCase):
 
@@ -65,4 +67,29 @@ class TrackingTest(unittest.TestCase):
 		teamPositions = [(2,-2), (-1,-1), (0,2), (-2,1)]
 		coordinates = tracker.getShootCoordinates(1, teamPositions)
 		expectedShootCoordinate = (2,0)
+		self.assertEqual(coordinates[0], expectedShootCoordinate)
+
+	def test_getShootCoordinates_avoid_selfhit_offset(self):
+		tracker = tracking.Tracker(tracking.STRAIGHT_DISTANCE2_PATTERN)
+		tracker.trackedTarget = (4,4)
+		teamPositions = [(6,2), (3,3), (4,6), (2,5)]
+		coordinates = tracker.getShootCoordinates(1, teamPositions)
+		expectedShootCoordinate = (6,4)
+		self.assertEqual(coordinates[0], expectedShootCoordinate)
+
+	def test_getShootCoordinates_avoid_selfhit_distance_3(self):
+		tracker = tracking.Tracker(tracking.STRAIGHT_DISTANCE2_PATTERN)
+		tracker.trackedTarget = (0,0)
+		teamPositions = [(3,-2), (3,-3), (2,-3), (1,-3), (0,-3), (-1,-2), (-2,-1), (-3,0), 
+						(-3,1), (-3,2), (-3,3), (-2,3), (1,3), (0,3), (1,2)]
+		coordinates = tracker.getShootCoordinates(1, teamPositions)
+		expectedShootCoordinate = (2,0)
+		self.assertEqual(coordinates[0], expectedShootCoordinate)
+
+	def test_getShootCoordinates_at_edge(self):
+		custom_pattern = {'stay':0, 'dist1':1, 'dist2Straight':0, 'dist2Curve':0}
+		tracker = tracking.Tracker(custom_pattern)
+		tracker.trackedTarget = (14,0)
+		coordinates = tracker.getShootCoordinates(1)
+		expectedShootCoordinate = (13,0)
 		self.assertEqual(coordinates[0], expectedShootCoordinate)

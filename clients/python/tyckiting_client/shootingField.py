@@ -34,5 +34,4 @@ class ShootingField(ProbabilityField):
 			newUsedCoordinates = hexagon.getCircle(radius, bestPosition[0], bestPosition[1])
 			newUsedCoordinates = hexagon.extractValidCoordinates(newUsedCoordinates, self.fieldRadius)
 			usedCoordinates |= newUsedCoordinates
-
 		return result

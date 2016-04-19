@@ -39,21 +39,24 @@ class Tracker(object):
 			target = self.getTarget()
 		if not target:
 			return None
+		print('target', target)
 		field = self._createField(target, teamPositions)
 		relativeCoordinates = field.getBestCoordinates(SHOOT_RADIUS, amount)
 		return [hexagon.cube_add(target, coord) for coord in relativeCoordinates]
 
 	def _createField(self, center, teamPositions=list()):
-		field = ShootingField(MOVE_RADIUS, totalProbability=0)
-		coordinates = hexagon.getCircle(MOVE_RADIUS, center[0], center[1])
+		field = ShootingField(MOVE_RADIUS+1, totalProbability=0)
+		coordinates = hexagon.getCircle(MOVE_RADIUS+1, center[0], center[1])
 		coordinates = hexagon.extractValidCoordinates(coordinates, FIELD_RADIUS)
 		for coord in coordinates:
 			moveType = self._getMovementType(center, coord)
 			relativePosition = hexagon.cube_substract(coord, center)
 			if coord in teamPositions:
 				value = float('-inf')
-			else:
+			elif moveType:
 				value = self.movementCounter[moveType]
+			else:
+				value = 0
 			field.set(relativePosition, value)
 		return field
 
@@ -100,6 +103,8 @@ class Tracker(object):
 				return 'dist2Straight'
 			else:
 				return 'dist2Curve'
+		else:
+			return None
 
 	def _updateTrackedTarget(self, targetsPos, oldTarget):
 		target = None
