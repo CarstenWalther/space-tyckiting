@@ -9,7 +9,7 @@ class EscapingTest(unittest.TestCase):
 		self.config = Config()
 		self.bot = Bot(0, 'bot1', 1, True, {"x":2,"y":1}, 10)
 
-	def testStraightdistance2Escaping(self):
+	def testStraightDistance2Escaping(self):
 		movement = escaping.StraightDistance2Escaping(self.config)
 		allMoves = set(movement.getPossibleMoves(self.bot))
 		expectedMoves = set((
@@ -19,6 +19,32 @@ class EscapingTest(unittest.TestCase):
 			(4,-1),
 			(2, 3),
 			(0, 3),
+		))
+		self.assertEqual(allMoves, expectedMoves)
+
+	def testDistance1Escaping(self):
+		movement = escaping.Distance1Escaping(self.config)
+		allMoves = set(movement.getPossibleMoves(self.bot))
+		expectedMoves = set((
+			(1, 1),
+			(2, 0),
+			(3, 0),
+			(3, 1),
+			(2, 2),
+			(1, 2),
+		))
+		self.assertEqual(allMoves, expectedMoves)
+
+	def testCurvedDistance2Escaping(self):
+		movement = escaping.CurvedDistance2Escaping(self.config)
+		allMoves = set(movement.getPossibleMoves(self.bot))
+		expectedMoves = set((
+			(1, 3),
+			(0, 2),
+			(1, 0),
+			(3,-1),
+			(4, 0),
+			(3, 2),
 		))
 		self.assertEqual(allMoves, expectedMoves)
 

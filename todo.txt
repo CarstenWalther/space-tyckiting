@@ -1,0 +1,34 @@
+###############################
+Movement Strategie,
+um bei random move wahrscheinlichkeiten getroffen zu werden für verschiedene moves zu haben (stehen bleiben, 2 felder grade, ein feld, zwei felder schräg)
+
+###############################
+Movement Strategie, 
+nicht zu nah an die eigenen bots moven, wenn einer zu nah ist, absichtlich in andere richtung moven
+
+###############################
+Movement Strategie,
+nicht zu nah an die Kante moven
+
+###############################
+Movement Strategie,
+movement strategien priorisieren und geeignete auswählen
+
+###############################
+Schuss Strategie,
+einer scannt, zwei schießen, nächste runde schießen drei
+(dimis idee)
+
+###############################
+
+
+
+###############################
+
+
+
+###############################
+
+
+
+###############################

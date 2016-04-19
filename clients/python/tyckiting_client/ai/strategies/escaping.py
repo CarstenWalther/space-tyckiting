@@ -40,6 +40,29 @@ class StraightDistance2Escaping(Escaping):
 		coordinates = hexagon.extractValidCoordinates(coordinates, self.config.field_radius)
 		return coordinates
 
+class Distance1Escaping(Escaping):
+
+	def getPossibleMoves(self, bot):
+		coordinates = set()
+		center = (bot.pos.x, bot.pos.y)
+		for direction in range(6):
+			coord = hexagon.neighbor(center, direction)
+			coordinates.add(coord)
+		coordinates = hexagon.extractValidCoordinates(coordinates, self.config.field_radius)
+		return coordinates
+
+class CurvedDistance2Escaping(Escaping):
+
+	def getPossibleMoves(self, bot):
+		coordinates = set()
+		center = (bot.pos.x, bot.pos.y)
+		for direction in range(6):
+			coord = hexagon.neighbor(center, direction)
+			coord = hexagon.neighbor(coord, (direction - 1) % 6)
+			coordinates.add(coord)
+		coordinates = hexagon.extractValidCoordinates(coordinates, self.config.field_radius)
+		return coordinates
+
 class AvoidSelfhit(Escaping):
 
 	def setEnemy(self, enemy_pos):
@@ -66,3 +89,15 @@ class AvoidSelfhit(Escaping):
 
 		coordinates = hexagon.extractValidCoordinates(coordinates, self.config.field_radius)
 		return coordinates
+
+class StatisticalEscaping(Escaping):
+
+	def __init__(self, config):
+		self.config = config
+		#self.probability_map = ...
+		#TODO
+
+
+
+	def getPossibleMoves(self, bot): #TODO
+		#TODO
