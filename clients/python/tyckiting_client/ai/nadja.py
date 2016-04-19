@@ -29,8 +29,6 @@ class Ai(base.BaseAi):
         available = livingCount - len(endangered)
         target = self.tracking.getTarget()
 
-        print(self.tracking.movementCounter)
-
         pendingTrackScan = False
         if target and available >= 2:
             pendingTrackScan = True

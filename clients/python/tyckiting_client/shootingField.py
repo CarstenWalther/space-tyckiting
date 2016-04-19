@@ -28,7 +28,6 @@ class ShootingField(ProbabilityField):
 					bestPosition = coord
 					bestPositionScore = totalProbability
 			
-			print('best score:', bestPositionScore, 'at', bestPosition)
 			result.append(bestPosition)
 			newUsedCoordinates = hexagon.getCircle(radius, bestPosition[0], bestPosition[1])
 			newUsedCoordinates = hexagon.extractValidCoordinates(newUsedCoordinates, self.fieldRadius)
