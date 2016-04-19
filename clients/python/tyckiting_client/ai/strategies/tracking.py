@@ -97,14 +97,13 @@ class Tracker(object):
 			else:
 				return 'dist2Curve'
 
-	def _updateTrackedTarget(self, targetsPos, center):
-		if len(targetsPos) == 0:
-			target = None
-		elif center:
-			validPositions = hexagon.extractValidCoordinates(targetsPos, MOVE_RADIUS, center)
+	def _updateTrackedTarget(self, targetsPos, oldTarget):
+		target = None
+		if oldTarget and len(targetsPos) > 0:
+			validPositions = hexagon.extractValidCoordinates(targetsPos, MOVE_RADIUS, oldTarget)
 			if len(validPositions) > 0:
 				target = validPositions.pop()
-		else:
+		if not target and len(targetsPos) > 0:
 			target = targetsPos[0]
 		self.trackedTarget = target
 
