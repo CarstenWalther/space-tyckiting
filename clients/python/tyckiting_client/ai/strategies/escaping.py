@@ -100,4 +100,5 @@ class StatisticalEscaping(Escaping):
 
 
 	def getPossibleMoves(self, bot): #TODO
+		pass
 		#TODO

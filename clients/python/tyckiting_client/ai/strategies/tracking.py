@@ -3,9 +3,14 @@ from collections import deque
 
 from tyckiting_client.notifications import defaultNotificationCenter, ID_START_ROUND_NOTIFICATION
 from tyckiting_client import hexagon
+from tyckiting_client.shootingField import ShootingField
 
 STRAIGHT_DISTANCE2_PATTERN = {'stay':0, 'dist1':0, 'dist2Straight':2, 'dist2Curve':0}
 BALANCED_PATTERN = {'stay':1, 'dist1':0, 'dist2Straight':2, 'dist2Curve':2}
+RANDOM_MOVE_PATTERN = {'stay':1, 'dist1':1, 'dist2Straight':1, 'dist2Curve':1}
+STAY_PATTERN = {'stay':1, 'dist1':0, 'dist2Straight':0, 'dist2Curve':0}
+
+FIELD_RADIUS = 14
 MOVE_RADIUS = 2
 SHOOT_RADIUS = 1
 
@@ -34,17 +39,22 @@ class Tracker(object):
 			target = self.getTarget()
 		if not target:
 			return None
-		field = self.createField()
-		return field.getTargets(amount, SHOOT_RADIUS)
+		field = self._createField(target)
+		relativeCoordinates = field.getBestCoordinates(SHOOT_RADIUS, amount)
+		return [hexagon.cube_add(target, coord) for coord in relativeCoordinates]
 
-	def createField(self):
-		#TODO
-		pass
+	def _createField(self, center):
+		field = ShootingField(MOVE_RADIUS, totalProbability=0)
+		coordinates = hexagon.getCircle(MOVE_RADIUS, center[0], center[1])
+		coordinates = hexagon.extractValidCoordinates(coordinates, FIELD_RADIUS)
+		for coord in coordinates:
+			moveType = self._getMovementType(center, coord)
+			relativePosition = hexagon.cube_substract(coord, center)
+			field.set(relativePosition, self.movementCounter[moveType])
+		return field
 
 	def _update(self, notification):
 		newPositions = []
-		if not self.teamBots:
-			initTeamBots(notification.data['bots'])
 		for event in notification.data['events']:
 			if event.event == 'radarEcho' or event.event == 'see':
 				newPositions.append(event.pos)
@@ -57,7 +67,6 @@ class Tracker(object):
 		usedPositionDestination = set()
 		movePairs = self._getPossibleMovements(self.knownEnemyPositions, newPositions)
 		actionsSortedByProbability = sorted(self.movementCounter, key=self.movementCounter.get, reverse=True)
-		print(actionsSortedByProbability)
 		for action in actionsSortedByProbability:
 			for movePair in movePairs:
 				if movePair[0] not in usedPositionStart and \
@@ -92,9 +101,9 @@ class Tracker(object):
 		if len(targetsPos) == 0:
 			target = None
 		elif center:
-			validPositions = hexagon.extractValidCoordinates(targetsPos, self.config.move, center)
+			validPositions = hexagon.extractValidCoordinates(targetsPos, MOVE_RADIUS, center)
 			if len(validPositions) > 0:
-				target = validPositions[0]
+				target = validPositions.pop()
 		else:
 			target = targetsPos[0]
 		self.trackedTarget = target

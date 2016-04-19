@@ -32,3 +32,20 @@ class TrackingTest(unittest.TestCase):
 		tracker._updateCounter([(2,2)])
 		expectedDictionary = {'stay':0, 'dist1':0, 'dist2Straight':3, 'dist2Curve':0}
 		self.assertEqual(tracker.movementCounter, expectedDictionary)
+
+	def test_createField(self):
+		tracker = tracking.Tracker(tracking.BALANCED_PATTERN)
+		target = (0,0)
+		field = tracker._createField(target)
+		self.assertEqual(field.field[(0,0)], tracking.BALANCED_PATTERN['stay'])
+		self.assertEqual(field.field[(1,0)], tracking.BALANCED_PATTERN['dist1'])
+		self.assertEqual(field.field[(2,0)], tracking.BALANCED_PATTERN['dist2Straight'])
+		self.assertEqual(field.field[(1,1)], tracking.BALANCED_PATTERN['dist2Curve'])
+
+	def test_getShootCoordinates_enemy_stays(self):
+		tracker = tracking.Tracker(tracking.STAY_PATTERN)
+		tracker.trackedTarget = (1,1)
+		coordinates = tracker.getShootCoordinates(1)
+		expectedShootCoordinate = (1,1)
+		self.assertEqual(len(coordinates), 1)
+		self.assertEqual(coordinates[0], expectedShootCoordinate)
