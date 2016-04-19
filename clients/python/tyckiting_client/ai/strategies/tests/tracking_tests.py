@@ -49,3 +49,20 @@ class TrackingTest(unittest.TestCase):
 		expectedShootCoordinate = (1,1)
 		self.assertEqual(len(coordinates), 1)
 		self.assertEqual(coordinates[0], expectedShootCoordinate)
+
+	def test_getShootCoordinates_two_shots_enemy_stays(self):
+		tracker = tracking.Tracker(tracking.STAY_PATTERN)
+		tracker.trackedTarget = (1,1)
+		coordinates = tracker.getShootCoordinates(2)
+		expectedShootCoordinate = (1,1)
+		self.assertEqual(len(coordinates), 2)
+		self.assertEqual(coordinates[0], expectedShootCoordinate)
+		self.assertEqual(coordinates[1], expectedShootCoordinate)
+
+	def test_getShootCoordinates_avoid_selfhit(self):
+		tracker = tracking.Tracker(tracking.STRAIGHT_DISTANCE2_PATTERN)
+		tracker.trackedTarget = (0,0)
+		teamPositions = [(2,-2), (-1,-1), (0,2), (-2,1)]
+		coordinates = tracker.getShootCoordinates(1, teamPositions)
+		expectedShootCoordinate = (2,0)
+		self.assertEqual(coordinates[0], expectedShootCoordinate)

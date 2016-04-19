@@ -3,6 +3,8 @@ import random
 from tyckiting_client import hexagon
 from tyckiting_client.probabilityField import ProbabilityField
 
+DAMPING_FACTOR = 0.5
+
 class ShootingField(ProbabilityField):
 
 	def getBestCoordinates(self, radius, amount=1):
@@ -22,7 +24,7 @@ class ShootingField(ProbabilityField):
 				totalProbability = sum(self.field[position] for position in positions)
 				for position in usedCoordinates:
 					if position in positions:
-						totalProbability -= self.field[position]/2
+						totalProbability -= self.field[position] * DAMPING_FACTOR
 				totalProbability += self.field[coord]
 				if totalProbability > bestPositionScore:
 					bestPosition = coord
