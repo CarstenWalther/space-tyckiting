@@ -49,7 +49,8 @@ def generateServerParameters(args):
 def startServer(args):
 	#print(generateServerParameters(args))
 	command = ['node', 'server/start-server.js'] + generateServerParameters(args)
-	subprocess.Popen(command, stdout=subprocess.DEVNULL)
+	with open(os.devnull, 'w') as devnull:
+		subprocess.Popen(command, stdout=devnull)
 
 def startSpectator():
 	spectator_url = 'http://localhost:3000/'
@@ -65,7 +66,8 @@ def startClients(args):
 		ai_2_cmd.append('--verbose2')
 	elif args.verbose:
 		ai_2_cmd.append('--verbose')
-	subprocess.Popen(ai_1_cmd, stdout=subprocess.DEVNULL)
+	with open(os.devnull, 'w') as devnull:
+		subprocess.Popen(ai_1_cmd, stdout=devnull)
 	subprocess.call(ai_2_cmd)
 	os.chdir('../..')
 
@@ -80,5 +82,6 @@ def startGame(args):
 
 if __name__ == '__main__':
 	args = parseArguments()
+	print(args)
 	for i in range(args.iterations):
 		startGame(args)
