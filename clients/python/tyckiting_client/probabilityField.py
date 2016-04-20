@@ -50,6 +50,11 @@ class ProbabilityField(object):
 	def set(self, key, value):
 		self.field[key] = value
 
+	def get(self, key):
+		if not key in self.field:
+			return 0.0
+		return self.field[key]
+
 	def blur(self, radius):
 		newField = dict()
 		for pos in hexagon.getCircle(self.fieldRadius):
