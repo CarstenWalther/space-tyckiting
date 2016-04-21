@@ -138,6 +138,20 @@ class spreadOwnBots(Escaping):
 		pass
 
 
+# list of tuples (probability, ....)
+# return (index, element)
+def chooseByProbability(plist):
+	index = 0
+	total = sum(p for p, *_ in plist)	
+	r = random.uniform(0, total)
+	for i, t in enumerate(plist):
+		r -= t[0]
+		if r < 0:
+			index = i
+			break
+	return (index, plist[index])
+
+
 class StatisticalEscaping(Escaping):
 
 	def __init__(self, config):
@@ -154,7 +168,7 @@ class StatisticalEscaping(Escaping):
 			( 0.4, StraightDistance2Escaping(config), 'StraightDistance2Escaping' ),
 			( 0.3, CurvedDistance2Escaping(config), 'CurvedDistance2Escaping' ),
 			( 0.2, Distance1Escaping(config), 'Distance1Escaping' ),
-			( 0.1, PretendToBeDead(config), 'PretendToBeDead' ),
+			#( 0.1, PretendToBeDead(config), 'PretendToBeDead' ),
 		]
 
 		self.escapeMoves = []
@@ -201,21 +215,85 @@ class StatisticalEscaping(Escaping):
 		# get sorted fields for direction and jump-styles
 		# take best direction that applies to jump style
 		# if there is none, take the best direction
-		index = 0
-		
-		total = sum(p for p, d, s, desc in self.escapeMoves)
-		r = random.uniform(0, total)
-		
-		upto = 0
-		for i, t in enumerate(self.escapeMoves):
-			prob, direction, style, desc = t
-			if upto + prob >= r:
-				index = i
-				break
-			upto += prob
+		index, move = chooseByProbability(self.escapeMoves)
 
 		self.movesWaitingForEvaluation.append(index)
-		prob, direction, style, desc = self.escapeMoves[index]
+		prob, direction, style, desc = move
+
+		directionFields = direction.getPossibleMoves(bot)
+		styleFields = style.getPossibleMoves(bot)
+		
+		for field in directionFields:
+			if field in styleFields:
+				return [field]
+
+		return [directionFields[0]]
+
+
+# similar to StatisticalEscaping, but evaluates strategies individually
+class StatisticalEscaping2(Escaping):
+
+	def __init__(self, config):
+		self.config = config
+
+		self.jumpDirections = [
+			( 0.5, AvoidWalls(config), 'AvoidWalls' ),
+			( 0.3, ChaseEnemy(config), 'ChaseEnemy' ),
+			( 0.2, RunFromEnemy(config), 'RunFromEnemy' ),
+			#spreadOwnBots(config)
+		]
+
+		self.jumpStyles = [
+			( 0.4, StraightDistance2Escaping(config), 'StraightDistance2Escaping' ),
+			( 0.3, CurvedDistance2Escaping(config), 'CurvedDistance2Escaping' ),
+			( 0.2, Distance1Escaping(config), 'Distance1Escaping' ),
+			#( 0.1, PretendToBeDead(config), 'PretendToBeDead' ),
+		]
+
+		# [(     0          ,      0)      , (1,0)]
+		# [(index(direction), index(style)), ...
+		self.movesWaitingForEvaluation = []
+		defaultNotificationCenter.registerFunc(ID_START_ROUND_NOTIFICATION, self._analyzeOutcome)
+
+	def logCurrentProbabilities(self):
+		logging.info('# Escape Strategies:')
+		sortedList = sorted([(e[0], e[2]) for e in (self.jumpDirections + self.jumpStyles)], reverse=True)
+		for p,desc in sortedList:
+			logging.info('  {:0.5f} {:s}'.format(p, desc))
+
+	def _analyzeOutcome(self, notification):
+		if not len(self.movesWaitingForEvaluation):
+			return
+
+		outcome = 1.25
+		
+		for event in notification.data['events']:
+			# damage is sufficient, because I get it also when died 
+			if event.event == 'damaged':
+				outcome *= 0.5
+
+		for index_dir, index_style in self.movesWaitingForEvaluation:
+			oldprob, *_ = self.jumpDirections[index_dir]
+			newprob = oldprob * outcome
+			self.jumpDirections[index_dir] = (newprob, *_)
+
+			oldprob, *_ = self.jumpStyles[index_style]
+			newprob = oldprob * outcome
+			self.jumpStyles[index_style] = (newprob, *_)
+
+		self.movesWaitingForEvaluation = []
+
+		self.logCurrentProbabilities()
+
+	def getPossibleMoves(self, bot):
+		logging.info('choose moves:')
+		index_dir, direction_tuple = chooseByProbability(self.jumpDirections)
+		index_style, style_tuple = chooseByProbability(self.jumpStyles)
+
+		self.movesWaitingForEvaluation.append((index_dir, index_style))
+
+		prob_dir, direction, *_ = direction_tuple
+		prob_style, style, *_ = style_tuple
 
 		directionFields = direction.getPossibleMoves(bot)
 		styleFields = style.getPossibleMoves(bot)
