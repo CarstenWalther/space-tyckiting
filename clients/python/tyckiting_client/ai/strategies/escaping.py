@@ -1,6 +1,8 @@
 import random
 import logging
 
+import numpy as np
+
 from tyckiting_client import hexagon
 from tyckiting_client.messages import Pos
 
@@ -108,7 +110,6 @@ class RunFromEnemy(Escaping):
 	def getPossibleMoves(self, bot):
 		coordinates = hexagon.getCircle(self.config.move, bot.pos.x, bot.pos.y)
 		gameField = GameField(self.config)
-		logging.info('run from enemy')
 		posAndEnemyProb = sorted([(gameField.enemyProbability(c), c) for c in coordinates])
 		return list(zip(*posAndEnemyProb))[1]
 
@@ -118,7 +119,6 @@ class ChaseEnemy(Escaping):
 	def getPossibleMoves(self, bot):
 		coordinates = hexagon.getCircle(self.config.move, bot.pos.x, bot.pos.y)
 		gameField = GameField(self.config)
-		logging.info('chase enemy: ')
 		posAndEnemyProb = sorted([(gameField.enemyProbability(c), c) for c in coordinates], reverse=True)
 		return list(zip(*posAndEnemyProb))[1]
 
@@ -127,15 +127,52 @@ class AvoidWalls(Escaping):
 
 	def getPossibleMoves(self, bot):
 		coordinates = hexagon.getCircle(self.config.move, bot.pos.x, bot.pos.y)
-		logging.info('avoid wall')
 		posAndEnemyProb = sorted([(hexagon.distance(c, (0, 0)), c) for c in coordinates], reverse=True)
 		return list(zip(*posAndEnemyProb))[1]
 
 
-class spreadOwnBots(Escaping):
+class SpreadOwnBots(Escaping):
+
+	def __init__(self, config):
+		self.config = config
+		defaultNotificationCenter.registerFunc(ID_START_ROUND_NOTIFICATION, self.updateOwnBotPositions)
+		self.bots = []
+
+	def distanceToWall(self, pos):
+		x = pos[0]
+		y = pos[0]
+		z = -x-y
+
+		ring = max(abs(x), abs(y), abs(z))
+		return self.config.field_radius - ring
+
+	def updateOwnBotPositions(self, notification):
+		self.bots = notification.data['bots']
+
 
 	def getPossibleMoves(self, bot):
-		pass
+		coordinates = list(hexagon.get_ring(coords=(bot.pos.x, bot.pos.y), radius=self.config.move ))
+		
+		table = np.zeros((len(coordinates), 4))
+		for i, coordinate in enumerate(coordinates):
+			distToWall = self.distanceToWall(coordinate)
+			distToMid = hexagon.distance(coordinate, (0,0))
+
+			gameField = GameField(self.config)
+			enemyProbability = gameField.enemyProbability(coordinate)
+
+			distToClosestTeamMate = min([hexagon.distance( (b.pos.x,b.pos.y), (bot.pos.x, bot.pos.y) ) for b in self.bots if b.bot_id != bot.bot_id])
+
+			table[i,:] = np.array([distToWall, distToMid, enemyProbability, distToClosestTeamMate])
+
+		# normalize each feature
+		for i in range(4):
+			values = table[:,i]
+			#table[:,i] = (values - values.min()) / (values.max() - values.min())
+			table[:,i] = values / values.sum()
+
+		scores = table.sum(axis=1)
+		return [coordinates[scores.argmin()]]
 
 
 # list of tuples (probability, ....)
