@@ -17,12 +17,10 @@ SHOOT_RADIUS = 1
 class Tracker(object):
 
 	'''
-	tracks the movement enemies
+	tracks the movement of enemies
 	decide the target by assuming the most probable movement
 	provide shoot coordiantes by maximizing the damage to 
 	the enemy based on predicted movement patterns
-
-	TODO: attention to edges and friendly ships
 	'''
 
 	def __init__(self, pattern):
