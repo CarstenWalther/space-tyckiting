@@ -144,29 +144,34 @@ class StatisticalEscaping(Escaping):
 		self.config = config
 
 		self.jumpDirections = [
-			( 0.5, AvoidWalls(config) ),
-			( 0.3, ChaseEnemy(config) ),
-			( 0.2, RunFromEnemy(config) ),
+			( 0.5, AvoidWalls(config), 'AvoidWalls' ),
+			( 0.3, ChaseEnemy(config), 'ChaseEnemy' ),
+			( 0.2, RunFromEnemy(config), 'RunFromEnemy' ),
 			#spreadOwnBots(config)
 		]
 
 		self.jumpStyles = [
-			( 0.4, StraightDistance2Escaping(config) ),
-			( 0.3, CurvedDistance2Escaping(config) ),
-			( 0.2, Distance1Escaping(config) ),
-			( 0.1, PretendToBeDead(config) ),
+			( 0.4, StraightDistance2Escaping(config), 'StraightDistance2Escaping' ),
+			( 0.3, CurvedDistance2Escaping(config), 'CurvedDistance2Escaping' ),
+			( 0.2, Distance1Escaping(config), 'Distance1Escaping' ),
+			( 0.1, PretendToBeDead(config), 'PretendToBeDead' ),
 		]
 
 		self.escapeMoves = []
-		for dprob, direction in self.jumpDirections:
-			for sprob, style in self.jumpStyles:
+		for dprob, direction, desc_dir in self.jumpDirections:
+			for sprob, style, desc_style in self.jumpStyles:
 				probability = dprob * sprob
-				escapeMove = (probability, direction, style)
+				escapeMove = (probability, direction, style, '{:s} {:s}'.format(desc_dir, desc_style))
 				self.escapeMoves.append(escapeMove)
 
 		self.movesWaitingForEvaluation = []
 		defaultNotificationCenter.registerFunc(ID_START_ROUND_NOTIFICATION, self._analyzeOutcome)
 
+	def logCurrentProbabilities(self):
+		logging.info('# Escape Strategies:')
+		sortedList = sorted([(e[0], e[3]) for e in self.escapeMoves], reverse=True)
+		for p,desc in sortedList:
+			logging.info('  {:0.5f} {:s}'.format(p, desc))
 
 	def _analyzeOutcome(self, notification):
 		if not len(self.movesWaitingForEvaluation):
@@ -183,11 +188,13 @@ class StatisticalEscaping(Escaping):
 				outcome *= 0.5
 
 		for index in self.movesWaitingForEvaluation:
-			oldprob, direction, style = self.escapeMoves[index]
+			oldprob, direction, style, desc = self.escapeMoves[index]
 			newprob = oldprob * outcome
-			self.escapeMoves[index] = (newprob, direction, style)
+			self.escapeMoves[index] = (newprob, direction, style, desc)
 
 		self.movesWaitingForEvaluation = []
+
+		self.logCurrentProbabilities()
 
 	def getPossibleMoves(self, bot):
 		# choose tuple with probability
@@ -196,19 +203,19 @@ class StatisticalEscaping(Escaping):
 		# if there is none, take the best direction
 		index = 0
 		
-		total = sum(p for p, d, s in self.escapeMoves)
+		total = sum(p for p, d, s, desc in self.escapeMoves)
 		r = random.uniform(0, total)
 		
 		upto = 0
 		for i, t in enumerate(self.escapeMoves):
-			prob, direction, style = t
+			prob, direction, style, desc = t
 			if upto + prob >= r:
 				index = i
 				break
 			upto += prob
 
 		self.movesWaitingForEvaluation.append(index)
-		prob, direction, style = self.escapeMoves[index]
+		prob, direction, style, desc = self.escapeMoves[index]
 
 		directionFields = direction.getPossibleMoves(bot)
 		styleFields = style.getPossibleMoves(bot)
