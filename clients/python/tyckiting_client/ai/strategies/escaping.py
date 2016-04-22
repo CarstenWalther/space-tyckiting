@@ -324,8 +324,13 @@ class StatisticalEscaping2(Escaping):
 				outcome *= 0.5
 
 		for index_dir, index_style in self.movesWaitingForEvaluation:
-			self.jumpDirections[index_dir][0] *= outcome
-			self.jumpStyles[index_style][0] *= outcome
+			oldprob, strategy, description = self.jumpDirections[index_dir]
+			newprob = oldprob * outcome
+			self.jumpDirections[index_dir] = (newprob, strategy, description)
+
+			oldprob, strategy, description = self.jumpStyles[index_style]
+			newprob = oldprob * outcome
+			self.jumpStyles[index_style] = (newprob, strategy, description)
 
 		self.movesWaitingForEvaluation = []
 
