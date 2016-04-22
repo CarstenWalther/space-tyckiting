@@ -140,7 +140,7 @@ class SpreadOwnBots(Escaping):
 
 	def distanceToWall(self, pos):
 		x = pos[0]
-		y = pos[0]
+		y = pos[1]
 		z = -x-y
 
 		ring = max(abs(x), abs(y), abs(z))
@@ -151,27 +151,41 @@ class SpreadOwnBots(Escaping):
 
 
 	def getPossibleMoves(self, bot):
-		coordinates = list(hexagon.get_ring(coords=(bot.pos.x, bot.pos.y), radius=self.config.move ))
+		coordinates = hexagon.get_ring(coords=(bot.pos.x, bot.pos.y), radius=self.config.move )
+		coordinates = list(hexagon.extractValidCoordinates(coordinates,self.config.field_radius))
 		
-		table = np.zeros((len(coordinates), 4))
+		table = np.zeros((len(coordinates), 3))
 		for i, coordinate in enumerate(coordinates):
-			distToWall = self.distanceToWall(coordinate)
+			# dont need: inverse to distance to mid if normalized
+			#distToWall = self.distanceToWall(coordinate) 
+			#distToWall /= self.config.field_radius
+
 			distToMid = hexagon.distance(coordinate, (0,0))
+			# normalize
+			distToMid /= self.config.field_radius
+			# fit to u shape curve to set mid and wall to 1 and inner circle to 0
+			distToInnerCircle = 16 * (distToMid - 0.5)**4
 
 			gameField = GameField(self.config)
 			enemyProbability = gameField.enemyProbability(coordinate)
 
 			distToClosestTeamMate = min([hexagon.distance( (b.pos.x,b.pos.y), (bot.pos.x, bot.pos.y) ) for b in self.bots if b.bot_id != bot.bot_id])
+			distToClosestTeamMate /= self.config.field_radius
 
-			table[i,:] = np.array([distToWall, distToMid, enemyProbability, distToClosestTeamMate])
+			table[i,:] = np.array([distToInnerCircle, enemyProbability, distToClosestTeamMate])
 
-		# normalize each feature
-		for i in range(4):
-			values = table[:,i]
-			#table[:,i] = (values - values.min()) / (values.max() - values.min())
-			table[:,i] = values / values.sum()
+		# normalize enemyProb
+		table[:,1] = table[:,1] / table[:,1].sum()
+		
+		#for i in range(3):
+			#values = table[:,i]
+			##table[:,i] = (values - values.min()) / (values.max() - values.min())
+			#table[:,i] = values / values.sum()
 
-		scores = table.sum(axis=1)
+		# minimize dist to inner circle
+		# maximize enemyProbability
+		# maximize dist to own bots
+		scores = table[:,0] + 1-table[:,1] + 1-table[:,2]
 		return [coordinates[scores.argmin()]]
 
 
