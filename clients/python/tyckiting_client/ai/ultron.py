@@ -14,7 +14,7 @@ Rules:
 like robin but in certain situations endangered bots stay and do an other action
 '''
 
-STAY_PROB = 0.33
+STAY_PROB = 0.15
 
 class Ai(base.BaseAi):
 
