@@ -96,6 +96,42 @@ class AvoidSelfhit(Escaping):
 		coordinates = hexagon.extractValidCoordinates(coordinates, self.config.field_radius)
 		return coordinates
 
+class AvoidGrouping(Escaping):
+
+	def __init__(self, config):
+		self.config = config
+		self.straight = StraightDistance2Escaping(self.config)
+		self.curved = CurvedDistance2Escaping(self.config)
+
+	def setTeammates(self, bots):
+		self.teammates = bots
+
+	def getPossibleMoves(self, bot):
+		coordinates = set()
+		center = (bot.pos.x, bot.pos.y)
+		max_distance = 0
+
+		c1 = self.straight.getPossibleMoves(bot)
+		c2 = self.curved.getPossibleMoves(bot)
+		moves = c1 | c2
+		distances = {}
+
+		max_distance = 0
+		for m in moves:
+			distance_to_team = 32
+			for own_bot in self.teammates:
+				if hexagon.distance(own_bot.pos, m) < distance_to_team:
+					distance_to_team = hexagon.distance(own_bot.pos, m)
+			distances[m] = distance_to_team
+			if distance_to_team > max_distance:
+				coordinates = set()
+				coordinates.add(m)
+				max_distance = distance_to_team
+			elif distance_to_team == max_distance:
+				coordinates.add(m)
+
+		return coordinates
+
 
 class PretendToBeDead(Escaping):
 
@@ -124,11 +160,91 @@ class ChaseEnemy(Escaping):
 
 
 class AvoidWalls(Escaping):
+	StraightDistance2Escaping
 
 	def getPossibleMoves(self, bot):
 		coordinates = hexagon.getCircle(self.config.move, bot.pos.x, bot.pos.y)
 		posAndEnemyProb = sorted([(hexagon.distance(c, (0, 0)), c) for c in coordinates], reverse=True)
 		return list(zip(*posAndEnemyProb))[1]
+
+class AvoidWallsAdvanced(Escaping):
+
+	def __init__(self, config):
+		self.config = config
+		self.straight = StraightDistance2Escaping(self.config)
+		self.curved = CurvedDistance2Escaping(self.config)
+
+	def getPossibleMoves(self, bot):
+		c1 = self.straight.getPossibleMoves(bot)
+		c2 = self.curved.getPossibleMoves(bot)
+		moves = c1 | c2
+
+		coordinates = set()
+		for c in moves:
+			if hexagon.distance(c, (0,0)) <= 12:
+				coordinates.add(c)
+		return coordinates
+
+
+
+		posAndEnemyProb = sorted([(hexagon.distance(c, (0, 0)), c) for c in coordinates], reverse=True)
+		return list(zip(*posAndEnemyProb))[1]
+
+class PipelineEscaping(Escaping):
+
+	def __init__(self, config):
+		self.config = config
+		self.avoid_selfhit = AvoidSelfhit(self.config)
+		self.avoid_walls = AvoidWallsAdvanced(self.config)
+		self.straight = StraightDistance2Escaping(self.config)
+		self.curved = CurvedDistance2Escaping(self.config)
+		self.avoid_grouping = AvoidGrouping(self.config)
+
+	def getMove(self, bot, own_bots, target):
+		source = ""
+
+		found = False
+
+		if target and hexagon.distance(bot.pos, target) < 4:
+			self.avoid_selfhit.setEnemy(target)
+			coords = self.avoid_selfhit.getPossibleMoves(bot)
+			if len(coords) != 0:
+				found = True
+
+			source = "avoid_selfhit"
+		if not found and hexagon.distance(bot.pos, (0,0)) > 11:
+			coords = self.avoid_walls.getPossibleMoves(bot)
+			if len(coords) != 0:
+				found = True
+			source = "avoid_walls"
+		if not found:
+			distance_to_team = 32
+			bots = own_bots.copy()
+			bots.remove(bot)
+			for own_bot in bots:
+				if hexagon.distance(own_bot.pos, bot.pos) < distance_to_team:
+					distance_to_team = hexagon.distance(own_bot.pos, bot.pos)
+
+			if distance_to_team < 4:
+				self.avoid_grouping.setTeammates(bots)
+				coords = self.avoid_grouping.getPossibleMoves(bot)
+				if len(coords) != 0:
+					found = True
+				source = "avoid_grouping"
+
+		if not found:
+				c1 = self.straight.getPossibleMoves(bot)
+				c2 = self.curved.getPossibleMoves(bot)
+				coords = c1 | c2
+				source = "two random"
+		logging.info('Source is %s', source)
+
+
+		coord = random.choice(list(coords))
+		pos = Pos(coord[0], coord[1])
+		logging.info('Move %d from %s to %s', bot.bot_id, bot.pos, pos)
+		return pos
+
 
 
 class SpreadOwnBots(Escaping):
