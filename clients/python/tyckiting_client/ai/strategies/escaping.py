@@ -167,6 +167,7 @@ class AvoidWalls(Escaping):
 		posAndEnemyProb = sorted([(hexagon.distance(c, (0, 0)), c) for c in coordinates], reverse=True)
 		return list(zip(*posAndEnemyProb))[1]
 
+
 class AvoidWallsAdvanced(Escaping):
 
 	def __init__(self, config):
@@ -184,132 +185,6 @@ class AvoidWallsAdvanced(Escaping):
 			if hexagon.distance(c, (0,0)) <= 12:
 				coordinates.add(c)
 		return coordinates
-
-
-
-		posAndEnemyProb = sorted([(hexagon.distance(c, (0, 0)), c) for c in coordinates], reverse=True)
-		return list(zip(*posAndEnemyProb))[1]
-
-class PipelineEscaping(Escaping):
-
-	def __init__(self, config):
-		self.config = config
-		self.avoid_selfhit = AvoidSelfhit(self.config)
-		self.avoid_walls = AvoidWallsAdvanced(self.config)
-		self.straight = StraightDistance2Escaping(self.config)
-		self.curved = CurvedDistance2Escaping(self.config)
-		self.avoid_grouping = AvoidGrouping(self.config)
-
-	def getMove(self, bot, own_bots, target):
-		source = ""
-
-		found = False
-
-		if target and hexagon.distance(bot.pos, target) < 4:
-			self.avoid_selfhit.setEnemy(target)
-			coords = self.avoid_selfhit.getPossibleMoves(bot)
-			if len(coords) != 0:
-				found = True
-
-			source = "avoid_selfhit"
-		if not found and hexagon.distance(bot.pos, (0,0)) > 11:
-			coords = self.avoid_walls.getPossibleMoves(bot)
-			if len(coords) != 0:
-				found = True
-			source = "avoid_walls"
-		if not found:
-			distance_to_team = 32
-			bots = own_bots.copy()
-			bots.remove(bot)
-			for own_bot in bots:
-				if hexagon.distance(own_bot.pos, bot.pos) < distance_to_team:
-					distance_to_team = hexagon.distance(own_bot.pos, bot.pos)
-
-			if distance_to_team < 4:
-				self.avoid_grouping.setTeammates(bots)
-				coords = self.avoid_grouping.getPossibleMoves(bot)
-				if len(coords) != 0:
-					found = True
-				source = "avoid_grouping"
-
-		if not found:
-				c1 = self.straight.getPossibleMoves(bot)
-				c2 = self.curved.getPossibleMoves(bot)
-				coords = c1 | c2
-				source = "two random"
-		logging.info('Source is %s', source)
-
-
-		coord = random.choice(list(coords))
-		pos = Pos(coord[0], coord[1])
-		logging.info('Move %d from %s to %s', bot.bot_id, bot.pos, pos)
-		return pos
-
-class PipelineEscapingAdvanced(Escaping):
-
-	def __init__(self, config):
-		self.config = config
-		self.avoid_selfhit = AvoidSelfhit(self.config)
-		self.avoid_walls = AvoidWallsAdvanced(self.config)
-		self.straight = StraightDistance2Escaping(self.config)
-		self.curved = CurvedDistance2Escaping(self.config)
-		self.avoid_grouping = AvoidGrouping(self.config)
-
-	def getMove(self, bot, own_bots, target):
-		source = ""
-		final_coords = set()
-		found = False
-
-		if target and hexagon.distance(bot.pos, target) < 5:
-			self.avoid_selfhit.setEnemy(target)
-			coords = self.avoid_selfhit.getPossibleMoves(bot)
-			final_coords = coords
-			source += "avoid_selfhit; "
-
-		if hexagon.distance(bot.pos, (0,0)) > 10:
-			coords = self.avoid_walls.getPossibleMoves(bot)
-			if len(final_coords) == 0:
-				final_coords = coords
-				source += "avoid_walls; "
-			else:
-				new_coords = final_coords & coords
-				if len(new_coords) > 0:
-					final_coords = new_coords
-					source += "avoid_walls; "
-
-		distance_to_team = 32
-		bots = own_bots.copy()
-		bots.remove(bot)
-		for own_bot in bots:
-			if hexagon.distance(own_bot.pos, bot.pos) < distance_to_team:
-				distance_to_team = hexagon.distance(own_bot.pos, bot.pos)
-			if distance_to_team < 5:
-				self.avoid_grouping.setTeammates(bots)
-				coords = self.avoid_grouping.getPossibleMoves(bot)
-				if len(final_coords) == 0:
-					final_coords = coords
-					source += "avoid_grouping; "
-				else:
-					new_coords = final_coords & coords
-					if len(new_coords) > 0:
-						final_coords = new_coords
-						source += "avoid_grouping; "
-
-		if len(final_coords) == 0:
-				c1 = self.straight.getPossibleMoves(bot)
-				c2 = self.curved.getPossibleMoves(bot)
-				final_coords = c1 | c2
-				source += "two random; "
-		logging.info('Source is %s', source)
-
-
-		coord = random.choice(list(final_coords))
-		pos = Pos(coord[0], coord[1])
-		logging.info('Move %d from %s to %s', bot.bot_id, bot.pos, pos)
-		return pos
-
-
-
 
 
 class SpreadOwnBots(Escaping):
@@ -330,21 +205,14 @@ class SpreadOwnBots(Escaping):
 	def updateOwnBotPositions(self, notification):
 		self.bots = notification.data['bots']
 
-
 	def getPossibleMoves(self, bot):
 		coordinates = hexagon.get_ring(coords=(bot.pos.x, bot.pos.y), radius=self.config.move )
 		coordinates = list(hexagon.extractValidCoordinates(coordinates,self.config.field_radius))
 		
 		table = np.zeros((len(coordinates), 3))
 		for i, coordinate in enumerate(coordinates):
-			# dont need: inverse to distance to mid if normalized
-			#distToWall = self.distanceToWall(coordinate) 
-			#distToWall /= self.config.field_radius
-
 			distToMid = hexagon.distance(coordinate, (0,0))
-			# normalize
 			distToMid /= self.config.field_radius
-			# fit to u shape curve to set mid and wall to 1 and inner circle to 0
 			distToInnerCircle = 16 * (distToMid - 0.5)**4
 
 			gameField = GameField(self.config)
@@ -355,185 +223,7 @@ class SpreadOwnBots(Escaping):
 
 			table[i,:] = np.array([distToInnerCircle, enemyProbability, distToClosestTeamMate])
 
-		# normalize enemyProb
 		table[:,1] = table[:,1] / table[:,1].sum()
-		
-		#for i in range(3):
-			#values = table[:,i]
-			##table[:,i] = (values - values.min()) / (values.max() - values.min())
-			#table[:,i] = values / values.sum()
-
-		# minimize dist to inner circle
-		# maximize enemyProbability
-		# maximize dist to own bots
 		scores = table[:,0] + 1-table[:,1] + 1-table[:,2]
 		return [coordinates[scores.argmin()]]
-
-
-# list of tuples (probability, ....)
-# return (index, element)
-def chooseByProbability(plist):
-	index = 0
-	total = sum(p for p, *_ in plist)	
-	r = random.uniform(0, total)
-	for i, t in enumerate(plist):
-		r -= t[0]
-		if r < 0:
-			index = i
-			break
-	return (index, plist[index])
-
-
-class StatisticalEscaping(Escaping):
-
-	def __init__(self, config):
-		self.config = config
-
-		self.jumpDirections = [
-			( 0.5, AvoidWalls(config), 'AvoidWalls' ),
-			( 0.3, ChaseEnemy(config), 'ChaseEnemy' ),
-			( 0.2, RunFromEnemy(config), 'RunFromEnemy' ),
-			#spreadOwnBots(config)
-		]
-
-		self.jumpStyles = [
-			( 0.4, StraightDistance2Escaping(config), 'StraightDistance2Escaping' ),
-			( 0.3, CurvedDistance2Escaping(config), 'CurvedDistance2Escaping' ),
-			( 0.2, Distance1Escaping(config), 'Distance1Escaping' ),
-			#( 0.1, PretendToBeDead(config), 'PretendToBeDead' ),
-		]
-
-		self.escapeMoves = []
-		for dprob, direction, desc_dir in self.jumpDirections:
-			for sprob, style, desc_style in self.jumpStyles:
-				probability = dprob * sprob
-				escapeMove = (probability, direction, style, '{:s} {:s}'.format(desc_dir, desc_style))
-				self.escapeMoves.append(escapeMove)
-
-		self.movesWaitingForEvaluation = []
-		defaultNotificationCenter.registerFunc(ID_START_ROUND_NOTIFICATION, self._analyzeOutcome)
-
-	def logCurrentProbabilities(self):
-		logging.info('# Escape Strategies:')
-		sortedList = sorted([(e[0], e[3]) for e in self.escapeMoves], reverse=True)
-		for p,desc in sortedList:
-			logging.info('  {:0.5f} {:s}'.format(p, desc))
-
-	def _analyzeOutcome(self, notification):
-		if not len(self.movesWaitingForEvaluation):
-			return
-
-		outcome = 1.10
-		
-		for event in notification.data['events']:
-			#if event.event == 'die' and event.botId:
-				#outcome -= 1.0
-
-			# damage is sufficient, because I get it also when died 
-			if event.event == 'damaged':
-				outcome *= 0.5
-
-		for index in self.movesWaitingForEvaluation:
-			oldprob, direction, style, desc = self.escapeMoves[index]
-			newprob = oldprob * outcome
-			self.escapeMoves[index] = (newprob, direction, style, desc)
-
-		self.movesWaitingForEvaluation = []
-
-		self.logCurrentProbabilities()
-
-	def getPossibleMoves(self, bot):
-		# choose tuple with probability
-		# get sorted fields for direction and jump-styles
-		# take best direction that applies to jump style
-		# if there is none, take the best direction
-		index, move = chooseByProbability(self.escapeMoves)
-
-		self.movesWaitingForEvaluation.append(index)
-		prob, direction, style, desc = move
-
-		directionFields = direction.getPossibleMoves(bot)
-		styleFields = style.getPossibleMoves(bot)
-		
-		for field in directionFields:
-			if field in styleFields:
-				return [field]
-
-		return [directionFields[0]]
-
-
-# similar to StatisticalEscaping, but evaluates strategies individually
-class StatisticalEscaping2(Escaping):
-
-	def __init__(self, config):
-		self.config = config
-
-		self.jumpDirections = [
-			( 0.5, AvoidWalls(config), 'AvoidWalls' ),
-			( 0.3, ChaseEnemy(config), 'ChaseEnemy' ),
-			( 0.2, RunFromEnemy(config), 'RunFromEnemy' ),
-			#spreadOwnBots(config)
-		]
-
-		self.jumpStyles = [
-			( 0.4, StraightDistance2Escaping(config), 'StraightDistance2Escaping' ),
-			( 0.3, CurvedDistance2Escaping(config), 'CurvedDistance2Escaping' ),
-			( 0.2, Distance1Escaping(config), 'Distance1Escaping' ),
-			#( 0.1, PretendToBeDead(config), 'PretendToBeDead' ),
-		]
-
-		# [(     0          ,      0)      , (1,0)]
-		# [(index(direction), index(style)), ...
-		self.movesWaitingForEvaluation = []
-		defaultNotificationCenter.registerFunc(ID_START_ROUND_NOTIFICATION, self._analyzeOutcome)
-
-	def logCurrentProbabilities(self):
-		logging.info('# Escape Strategies:')
-		sortedList = sorted([(e[0], e[2]) for e in (self.jumpDirections + self.jumpStyles)], reverse=True)
-		for p,desc in sortedList:
-			logging.info('  {:0.5f} {:s}'.format(p, desc))
-
-	def _analyzeOutcome(self, notification):
-		if not len(self.movesWaitingForEvaluation):
-			return
-
-		outcome = 1.25
-		
-		for event in notification.data['events']:
-			# damage is sufficient, because I get it also when died 
-			if event.event == 'damaged':
-				outcome *= 0.5
-
-		for index_dir, index_style in self.movesWaitingForEvaluation:
-			oldprob, strategy, description = self.jumpDirections[index_dir]
-			newprob = oldprob * outcome
-			self.jumpDirections[index_dir] = (newprob, strategy, description)
-
-			oldprob, strategy, description = self.jumpStyles[index_style]
-			newprob = oldprob * outcome
-			self.jumpStyles[index_style] = (newprob, strategy, description)
-
-		self.movesWaitingForEvaluation = []
-
-		self.logCurrentProbabilities()
-
-	def getPossibleMoves(self, bot):
-		logging.info('choose moves:')
-		index_dir, direction_tuple = chooseByProbability(self.jumpDirections)
-		index_style, style_tuple = chooseByProbability(self.jumpStyles)
-
-		self.movesWaitingForEvaluation.append((index_dir, index_style))
-
-		prob_dir, direction, *_ = direction_tuple
-		prob_style, style, *_ = style_tuple
-
-		directionFields = direction.getPossibleMoves(bot)
-		styleFields = style.getPossibleMoves(bot)
-		
-		for field in directionFields:
-			if field in styleFields:
-				return [field]
-
-		return [directionFields[0]]
-
 		

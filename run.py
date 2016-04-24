@@ -20,12 +20,8 @@ def parseArguments():
 						help="Verbose output for ai_2")
 	parser.add_argument('-V', '--verbose2', action='store_true',
 						help="More Verbose output for ai_2")
-	#parser.add_argument('-H', '--headless', action='store_true',
-	#					help="runs without waiting and without the spectator")
 	parser.add_argument('-i', '--iterations', type=int, default=1, metavar='n',
 						help="specifies number of fights; default is 1")
-	#parser.add_argument('-w', '--wait', type=int, default=300, metavar='t',
-	#					help='time in milliseconds between two rounds')
 	return parser.parse_args()
 
 def getBrowserCmd():
@@ -38,17 +34,8 @@ def getBrowserCmd():
 		print('could not recognize platform')
 		sys.exit(1)
 
-def generateServerParameters(args):
-	params = []
-	return params
-	#params += ['--delay', str(args.wait)]
-	if args.headless:
-		params += ['--overdrive', 'true']
-	return params
-
 def startServer(args):
-	#print(generateServerParameters(args))
-	command = ['node', 'server/start-server.js'] + generateServerParameters(args)
+	command = ['node', 'server/start-server.js']
 	with open(os.devnull, 'w') as devnull:
 		subprocess.Popen(command, stdout=devnull)
 
@@ -82,6 +69,5 @@ def startGame(args):
 
 if __name__ == '__main__':
 	args = parseArguments()
-	print(args)
 	for i in range(args.iterations):
 		startGame(args)

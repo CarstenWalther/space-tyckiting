@@ -25,8 +25,6 @@ class UncertainTracker(object):
 	Is it all worth it??? We will see
 
 	prefer certain targets over uncertain targets
-	TODO: try other way around
-	TODO: track target depending on most probable movement
 	'''
 
 	def __init__(self, pattern):

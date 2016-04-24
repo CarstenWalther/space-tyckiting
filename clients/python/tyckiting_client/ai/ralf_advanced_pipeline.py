@@ -1,6 +1,6 @@
 from tyckiting_client.ai import base
 from tyckiting_client import actions
-from tyckiting_client.ai.strategies import escaping
+from tyckiting_client.ai.strategies import pipelineEscaping
 from tyckiting_client.ai.strategies import scanning
 from tyckiting_client.ai.strategies import tracking
 
@@ -13,7 +13,7 @@ class Ai(base.BaseAi):
 
     def __init__(self, team_id, config=None):
         super(Ai, self).__init__(team_id, config)
-        self.escaping = escaping.PipelineEscapingAdvanced(self.config)
+        self.escaping = pipelineEscaping.PipelineEscapingAdvanced(self.config)
         self.scanning = scanning.StatisticalScanning(self.config)
         self.tracking = tracking.Tracker(tracking.STRAIGHT_DISTANCE2_PATTERN)
 

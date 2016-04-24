@@ -1,5 +1,6 @@
 import time
 import logging
+import random
 
 COUNT = 0
 SUM = 1
@@ -41,3 +42,14 @@ def printExecTimeTable(funcStats):
 	for total, avg, count, maximum, func in funcStats:
 		func = 'total' if func == 'decide' else func
 		logging.info('{: 10.2f}|{: 10.2f}|{: 10.2f}|{: 10.2f}| {:s}'.format(total, avg, count, maximum, func))
+
+def chooseByProbability(plist):
+	index = 0
+	total = sum(p for p, *_ in plist)	
+	r = random.uniform(0, total)
+	for i, t in enumerate(plist):
+		r -= t[0]
+		if r < 0:
+			index = i
+			break
+	return (index, plist[index])
