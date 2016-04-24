@@ -102,13 +102,13 @@ class AvoidGrouping(Escaping):
 		self.config = config
 		self.straight = StraightDistance2Escaping(self.config)
 		self.curved = CurvedDistance2Escaping(self.config)
+		self.teammates = None
 
 	def setTeammates(self, bots):
 		self.teammates = bots
 
 	def getPossibleMoves(self, bot):
 		coordinates = set()
-		center = (bot.pos.x, bot.pos.y)
 		max_distance = 0
 
 		c1 = self.straight.getPossibleMoves(bot)
@@ -160,7 +160,6 @@ class ChaseEnemy(Escaping):
 
 
 class AvoidWalls(Escaping):
-	StraightDistance2Escaping
 
 	def getPossibleMoves(self, bot):
 		coordinates = hexagon.getCircle(self.config.move, bot.pos.x, bot.pos.y)

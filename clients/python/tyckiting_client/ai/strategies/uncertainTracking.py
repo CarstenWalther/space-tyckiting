@@ -40,7 +40,7 @@ class UncertainTracker(object):
 		#consists of (x, y, radius)
 		return self.trackedTarget
 
-	def getShootCoordinates(self, amount, teamPositions=list()):
+	def getShootCoordinates(self, amount, teamPositions=None):
 		if not self.trackedTarget:
 			return None
 		targetCoord = self.trackedTarget[0:2]
@@ -49,7 +49,9 @@ class UncertainTracker(object):
 		relativeCoordinates = field.getBestCoordinates(SHOOT_RADIUS, amount)
 		return [hexagon.cube_add(targetCoord, coord) for coord in relativeCoordinates]
 
-	def _createField(self, center, teamPositions=list(), certainRadius=0):
+	def _createField(self, center, teamPositions=None, certainRadius=0):
+		if not teamPositions:
+			teamPositions = []
 		if certainRadius == 0:
 			return self._fillCertainField(center, teamPositions)
 		elif certainRadius == 1:
@@ -110,7 +112,7 @@ class UncertainTracker(object):
 		certainPositions = self._findCertainPositions(notification)
 		self._updateCounter(self.knownEnemyPositions, certainPositions)
 		self.knownEnemyPositions = certainPositions
-		self.knownUncertainEnemyPositions = self._findUncertainPositions(notification, certainPositions)		
+		self.knownUncertainEnemyPositions = self._findUncertainPositions(notification)		
 		self._updateTrackedTarget()
 
 	def _findCertainPositions(self, notification):
@@ -120,7 +122,7 @@ class UncertainTracker(object):
 				positions.append(event.pos)
 		return positions
 
-	def _findUncertainPositions(self, notification, certainPositions):
+	def _findUncertainPositions(self, notification):
 		positions = []
 		for event in notification.data['events']:
 			if event.event == 'hit':

@@ -32,7 +32,7 @@ class Tracker(object):
 	def getTarget(self):
 		return self.trackedTarget
 
-	def getShootCoordinates(self, amount, teamPositions=list(), target=None):
+	def getShootCoordinates(self, amount, teamPositions=None, target=None):
 		if not target:
 			target = self.getTarget()
 		if not target:
@@ -41,7 +41,9 @@ class Tracker(object):
 		relativeCoordinates = field.getBestCoordinates(SHOOT_RADIUS, amount)
 		return [hexagon.cube_add(target, coord) for coord in relativeCoordinates]
 
-	def _createField(self, center, teamPositions=list()):
+	def _createField(self, center, teamPositions=None):
+		if not teamPositions:
+			teamPositions = []
 		field = ShootingField(MOVE_RADIUS+1, totalProbability=0)
 		coordinates = hexagon.getCircle(MOVE_RADIUS+1, center[0], center[1])
 		coordinates = hexagon.extractValidCoordinates(coordinates, FIELD_RADIUS)

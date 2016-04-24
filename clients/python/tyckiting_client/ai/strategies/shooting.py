@@ -1,8 +1,6 @@
 import random
-import logging
 
 from tyckiting_client import hexagon
-from tyckiting_client.messages import Pos
 
 class Shooting(object):
 
@@ -20,7 +18,7 @@ class RandomShooting(Shooting):
 
 	def getPossibleShootPositions(self, targetPos, shooterAmount):
 		coords = []
-		for i in range(shooterAmount):
+		for _ in range(shooterAmount):
 			coords.append(hexagon.getCircle(self.config.move, targetPos.x, targetPos.y))
 
 class SpreadShooting(Shooting):

@@ -65,7 +65,6 @@ class PipelineEscapingAdvanced(PipelineEscaping):
 	def getMove(self, bot, own_bots, target):
 		source = ""
 		final_coords = set()
-		found = False
 
 		if target and hexagon.distance(bot.pos, target) < 5:
 			self.avoid_selfhit.setEnemy(target)

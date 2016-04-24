@@ -1,11 +1,9 @@
 import random
-import logging
 
 from tyckiting_client import hexagon
 from tyckiting_client.messages import Pos
 from tyckiting_client.gameField import GameField
-
-from tyckiting_client.utilities import *
+from tyckiting_client.utilities import log_execution_time
 
 class Scanning(object):
 
