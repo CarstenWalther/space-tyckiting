@@ -1,9 +1,5 @@
-import random
-import logging
-
 from tyckiting_client.ai import base
 from tyckiting_client import actions
-from tyckiting_client.ai.strategies.triangleShot import TriangleShot
 from tyckiting_client.ai.strategies import escaping
 from tyckiting_client.ai.strategies import scanning
 from tyckiting_client.ai.strategies import shooting

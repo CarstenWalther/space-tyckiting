@@ -3,12 +3,12 @@ from tyckiting_client.notifications import ID_END_ROUND_NOTIFICATION
 from tyckiting_client.notifications import ID_START_ROUND_NOTIFICATION
 from tyckiting_client.probabilityField import ProbabilityField
 
-from tyckiting_client.utilities import *
+from tyckiting_client.utilities import log_execution_time
 
-class GameField:
-	class DefaultGameField:
+class GameField(object):
+
+	class DefaultGameField(object):
 		def __init__(self, config):
-			logging.info('##### GameField created #####')
 			self.config = config
 			self.enemyProbabilityField = ProbabilityField(config.field_radius, self.config.bots)
 			defaultNotificationCenter.registerFunc(ID_END_ROUND_NOTIFICATION, self._mindOwnScans)
@@ -36,6 +36,7 @@ class GameField:
 			self.enemyProbabilityField.blur(self.config.move)
 
 	instance = None
+
 	def __init__(self, config):
 		if not GameField.instance:
 			GameField.instance = GameField.DefaultGameField(config)

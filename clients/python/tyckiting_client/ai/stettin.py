@@ -1,12 +1,9 @@
-import logging
 import random
 
 from tyckiting_client.ai import base
 from tyckiting_client import actions
-from tyckiting_client import hexagon
 from tyckiting_client.ai.strategies import escaping
 from tyckiting_client.ai.strategies import scanning
-from tyckiting_client.ai.strategies import shooting
 from tyckiting_client.ai.strategies import uncertainTracking
 
 '''

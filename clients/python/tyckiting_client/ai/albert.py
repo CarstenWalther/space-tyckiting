@@ -1,4 +1,3 @@
-import random
 import logging
 
 from tyckiting_client import actions

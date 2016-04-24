@@ -1,15 +1,10 @@
 import logging
-from tyckiting_client.utilities import *
 
-from tyckiting_client import messages
-from tyckiting_client import hexagon
 from tyckiting_client import stats
-
 import tyckiting_client.notifications as notifications
+from tyckiting_client.utilities import log_execution_time, log_execution_time_stats
 
-from tyckiting_client.utilities import *
-
-class BaseAi:
+class BaseAi(object):
 
     def __init__(self, team_id, config=None):
         """

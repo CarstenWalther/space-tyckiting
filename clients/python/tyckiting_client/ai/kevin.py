@@ -1,9 +1,6 @@
-import random
-
 from tyckiting_client.ai import base
 from tyckiting_client import actions
 from tyckiting_client import hexagon
-from tyckiting_client.ai.strategies.triangleShot import TriangleShot
 from tyckiting_client.ai.strategies import escaping
 from tyckiting_client.ai.strategies import scanning
 from tyckiting_client.ai.strategies import shooting
@@ -48,7 +45,6 @@ class Ai(base.BaseAi):
             target = max(targetDistanceToOwnBots)[1]
 
         endangered = self.getEndangeredBots(events)
-        #todo: improve
         if target:
             dangerousTiles = hexagon.getCircle(self.config.cannon + 2, target.x, target.y)
             ownBotsAboutToSelfHit = [bot.bot_id for bot in bots if (bot.pos.x, bot.pos.y) in dangerousTiles]

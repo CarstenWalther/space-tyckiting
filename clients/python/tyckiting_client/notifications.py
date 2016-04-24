@@ -5,13 +5,13 @@ ID_END_ROUND_NOTIFICATION = 'end of round'
 ID_START_ROUND_NOTIFICATION = 'start of round'
 
 
-class Notification:
+class Notification(object):
 	def __init__(self, identifier, data):
 		self.identifier = identifier
 		self.data = data
 
 
-class NotificationCenter:
+class NotificationCenter(object):
 	def __init__(self):
 		self.listeningFunctions = dict()
 

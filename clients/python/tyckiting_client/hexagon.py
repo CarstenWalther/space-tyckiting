@@ -26,7 +26,7 @@ def get_ring(coords=(0,0), radius=1):
 	results = set()
 	cube = cube_add(coords, (-radius, radius))
 	for i in range(6):
-		for j in range(radius):
+		for _ in range(radius):
 			results.add(cube)
 			cube = neighbor(cube, i)
 	return results
@@ -64,9 +64,9 @@ def distance(pos1, pos2):
 	y_dist = abs(pos2[1] - pos1[1])
 	z_dist = abs(z2 - z1)
 
-	distance = max(x_dist, y_dist, z_dist)
+	dist = max(x_dist, y_dist, z_dist)
 
-	return distance
+	return dist
 
 def isStraightLine(pos1, pos2):
 	dx = pos1[0] - pos2[0]

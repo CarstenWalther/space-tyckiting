@@ -1,5 +1,3 @@
-import random
-
 from tyckiting_client.ai import base
 from tyckiting_client import actions
 from tyckiting_client.ai.strategies.triangleShot import TriangleShot
