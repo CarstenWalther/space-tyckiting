@@ -1,19 +1,27 @@
-# Space Tyckiting
+# Space Tyckiting AI
 
-![Space Tyckiting banner](space-tyckiting-banner.jpg)
+This is a bot that was created for [Futurice's space tyckiting challenge](http://spacetyckiting.futurice.com/). We got 2nd place in the [Berlin event](http://challonge.com/spacetyckitingberlin). The repository contains different AIs of varying strength. The AI used for the actual matches is *stettin*.
 
-Welcome to **Futurice Space Tyckiting**!
+Authors: Balthasar Martin, Carsten Walther, Marvin Bornstein<br>
+Idea providers: Dimitri Schmidt, Lukas Wagner, Pascal Lange<br>
+Client skeleton written by: Axel Eirola
 
-This repository contains the Space Tyckiting server and client skeletons.
+### Requirements:
+* node
+* python3
+* websocket-client
+* numpy
+* nose (for running tests)
 
-Space Tyckiting server communicates via a *JSON-over-TCP* protocol, making it possible for the clients to be implemented in any language of your choice.
+### Install:
+Go into the server directory and execute the following command:
 
-Ready-made client skeletons, which provide a convenient network communication layer, have been provided for a number of programming languages. You may also wish to create your very own client from scratch &mdash; no problem! Take a look at the example clients and documentation and code ahead! If you'd like to share your client skeleton, please issue a Pull Request.
+`npm install`
 
-If you discover any bugs or issues with the server or the provided client skeletons, please let us know, and if possible, issue a PR with a fix!
+### Execute:
+`run.sh` is a convenient script to start a fight between two AIs.
+An example command is:
 
-Please see the server [README](server/README.md), and the README's of the clients, for details on how to develop your AI and run Space Tyckiting.
+`./run.sh gertrude stettin --verbose`
 
-Happy Space Tyckiting!
-
-![Space Tyckiting](space-tyckiting.gif)
+This starts a server, opens a spectator tab in the browser and starts the clients. *Gertrude* and *stettin* are two of the AIs that can be found in `clients/python/tyckiting_client/ai/`. The script was tested on Ubuntu and OS X.
